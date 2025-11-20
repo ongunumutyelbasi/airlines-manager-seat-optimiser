@@ -642,7 +642,7 @@
                     (required.cargo * SEAT_WEIGHTS.C);
 
                 // Check if any passenger class requires 0 seats
-                const hasZeroSeats = required.eco === 0 || required.bus === 0 || required.first === 0;
+                const hasZeroSeats = required.eco === 0 && required.bus === 0 && required.first === 0;
 
                 // --- VALIDATION & STYLING LOGIC ---
                 let validationIcon = 'check';
