@@ -235,24 +235,24 @@
 
                 <!-- 2. Route Demand Card --><div class="bg-[#0f1014]/80 backdrop-blur-md border border-white/10 rounded-xl p-4 shadow-lg glow-border">
                     <h2 class="text-sm font-bold text-cyan-300 mb-3 flex items-center gap-2 uppercase tracking-wider">
-                        <i data-lucide="users" class="w-4 h-4"></i> Route Demand (24H - Return Trip)
+                        <i data-lucide="users" class="w-4 h-4"></i> Preferred Seat Configuration
                     </h2>
                     <!-- Single Row for all 4 inputs --><div class="grid grid-cols-4 gap-2">
                         <!-- Economy --><div class="group">
                             <label class="block text-[10px] font-bold text-slate-600 mb-1 text-center uppercase group-hover:text-cyan-500 transition-colors">Economy</label>
-                            <input type="number" id="demandEco" value="0" class="w-full bg-black/40 border border-white/10 rounded px-1 py-2 text-white text-center focus:border-cyan-400 outline-none transition-all font-mono text-sm hover:bg-cyan-950/5">
+                            <input type="number" id="prefEco" value="0" class="w-full bg-black/40 border border-white/10 rounded px-1 py-2 text-white text-center focus:border-cyan-400 outline-none transition-all font-mono text-sm hover:bg-cyan-950/5">
                         </div>
                         <!-- Business --><div class="group">
                             <label class="block text-[10px] font-bold text-slate-600 mb-1 text-center uppercase group-hover:text-emerald-500 transition-colors">Business</label>
-                            <input type="number" id="demandBus" value="0" class="w-full bg-black/40 border border-white/10 rounded px-1 py-2 text-white text-center focus:border-emerald-400 outline-none transition-all font-mono text-sm hover:bg-emerald-950/5">
+                            <input type="number" id="prefBus" value="0" class="w-full bg-black/40 border border-white/10 rounded px-1 py-2 text-white text-center focus:border-emerald-400 outline-none transition-all font-mono text-sm hover:bg-emerald-950/5">
                         </div>
                         <!-- First --><div class="group">
                             <label class="block text-[10px] font-bold text-slate-600 mb-1 text-center uppercase group-hover:text-purple-500 transition-colors">First</label>
-                            <input type="number" id="demandFirst" value="0" class="w-full bg-black/40 border border-white/10 rounded px-1 py-2 text-white text-center focus:border-purple-400 outline-none transition-all font-mono text-sm hover:bg-purple-950/5">
+                            <input type="number" id="prefFirst" value="0" class="w-full bg-black/40 border border-white/10 rounded px-1 py-2 text-white text-center focus:border-purple-400 outline-none transition-all font-mono text-sm hover:bg-purple-950/5">
                         </div>
                         <!-- Cargo --><div class="group">
                             <label class="block text-[10px] font-bold text-slate-600 mb-1 text-center uppercase group-hover:text-amber-500 transition-colors">Cargo (Tonnes RT)</label>
-                            <input type="number" id="demandCargo" value="0" step="0.1" class="w-full bg-black/40 border border-white/10 rounded px-1 py-2 text-white text-center focus:border-amber-400 outline-none transition-all font-mono text-sm hover:bg-amber-950/5">
+                            <input type="number" id="prefCargo" value="0" step="0.1" class="w-full bg-black/40 border border-white/10 rounded px-1 py-2 text-white text-center focus:border-amber-400 outline-none transition-all font-mono text-sm hover:bg-amber-950/5">
                         </div>
                     </div>
                 </div>
@@ -494,8 +494,8 @@
         const durationToggle = document.getElementById('durationToggle'); 
         const durationContent = document.getElementById('durationContent'); // Reference to the hours/minutes section
         
-        const demandInputs = ['demandEco', 'demandBus', 'demandFirst', 'demandCargo'].map(id => document.getElementById(id));
-        const allInputs = [inputCapacity, inputPayload, ...demandInputs, hoursInput, minutesInput, durationToggle];
+        const prefInputs = ['prefEco', 'prefBus', 'prefFirst', 'prefCargo'].map(id => document.getElementById(id));
+        const allInputs = [inputCapacity, inputPayload, ...prefInputs, hoursInput, minutesInput, durationToggle];
 
         /**
          * Converts total minutes to "Hh Mm" format.
@@ -561,10 +561,10 @@
             const totalFlightMinutes = (durationHours * 60) + durationMinutes;
 
             const demand = {
-                eco: parseInt(document.getElementById('demandEco').value) || 0,
-                bus: parseInt(document.getElementById('demandBus').value) || 0,
-                first: parseInt(document.getElementById('demandFirst').value) || 0,
-                cargo: parseFloat(document.getElementById('demandCargo').value) || 0,
+                eco: parseInt(document.getElementById('prefEco').value) || 0,
+                bus: parseInt(document.getElementById('prefBus').value) || 0,
+                first: parseInt(document.getElementById('prefFirst').value) || 0,
+                cargo: parseFloat(document.getElementById('prefCargo').value) || 0,
             };
             
             // Update UI visibility based on toggle state
