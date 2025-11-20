@@ -147,7 +147,7 @@
 
     <!-- Main Container --><div class="max-w-7xl mx-auto p-4 md:p-6">
         
-        <!-- Header --><header class="mb-6 flex items-center justify-between border-b border-white/10 pb-4">
+        <header class="mb-6 flex items-center justify-between border-b border-white/10 pb-4">
             <div class="flex items-center gap-3">
                 <div class="p-2.5 bg-cyan-950/20 border border-cyan-500/20 rounded-lg shadow-[0_0_10px_rgba(34,211,238,0.1)]">
                     <i data-lucide="plane" class="w-6 h-6 text-cyan-300"></i>
@@ -305,7 +305,7 @@
                                     <th class="p-3 font-bold text-purple-500">First</th>
                                     <th class="p-3 font-bold text-amber-500">Cargo (t)</th>
                                     <th class="p-3 font-bold text-red-400 min-w-[100px]">Payload (tonnes)</th>
-                                    <th class="p-3 font-bold text-red-400 min-w-[100px]">Capacity (passengers)</th>
+                                    <th class="p-3 font-bold text-red-400 min-w-[100px]">Capacity (seats)</th>
                                     <th class="p-3 font-bold text-green-400">Valid?</th>
                                 </tr>
                             </thead>
@@ -499,15 +499,16 @@
             // 2. Calculate required capacity (can be fractional)
             const requiredCapacity = adjustedDemand / totalPassengerSlots;
 
-            // 3. Apply the Zero Threshold/Ceiling Logic
+            // 3. Apply the Zero Threshold/Rounding Down Logic
             if (requiredCapacity === 0) {
                 return 0;
             } else if (requiredCapacity < 1) {
                 // If the required capacity is fractional but less than 1 
                 return 0;
             } else {
-                // For 1.0 or any fractional number > 1, use Math.ceil()
-                return Math.ceil(requiredCapacity);
+                // Use Math.floor() to round the fractional seat number down 
+                // to the nearest whole number, as requested.
+                return Math.floor(requiredCapacity);
             }
         }
 
