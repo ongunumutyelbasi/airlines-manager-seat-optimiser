@@ -161,7 +161,7 @@
             <nav class="pt-4 mt-2"> <!-- Removed border-t -->
                 <ul class="flex space-x-8 text-base font-semibold">
                     <li>
-                        <a href="index.html" class="text-slate-500 hover:text-cyan-400 hover:border-b-2 hover:border-cyan-700 pb-0.5 transition duration-200">
+                        <a href="index.html" class="text-slate-500 border-cyan-700 hover:text-cyan-400 hover:border-b-2 hover:border-cyan-700 pb-0.5 transition duration-200">
                             SEAT PLANNER
                         </a>
                     </li>
@@ -254,6 +254,9 @@
                             <label class="block text-[10px] font-bold text-slate-600 mb-1 text-center uppercase group-hover:text-amber-500 transition-colors">Cargo (Tonnes RT)</label>
                             <input type="number" id="prefCargo" value="0" step="0.1" class="w-full bg-black/40 border border-white/10 rounded px-1 py-2 text-white text-center focus:border-amber-400 outline-none transition-all font-mono text-sm hover:bg-amber-950/5">
                         </div>
+
+                        <!--INSERT DYNAMIC COLOURED CAPACITY + PAYLOAD BAR(S) HERE-->
+
                     </div>
                 </div>
 
@@ -341,7 +344,7 @@
         </div>
     </div>
 
-    <!-- LOGIC SCRIPT (Full and complete) --><script>
+    <script>
         // --- CONSTANTS ---
         const PLANES_DB = [
             { model: 'Custom Aircraft (Enter Below)', maxCapacity: 0, maxPayload: 0 },
