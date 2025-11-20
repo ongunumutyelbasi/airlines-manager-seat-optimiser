@@ -153,7 +153,7 @@
                     <i data-lucide="plane" class="w-6 h-6 text-cyan-300"></i>
                 </div>
                 <div>
-                    <h1 class="text-3xl font-bold text-white tracking-wide glow-text uppercase">Seat Optimiser</h1>
+                    <h1 class="text-3xl font-bold text-white tracking-wide glow-text uppercase">Reverse Seat Optimiser</h1>
                     <p class="text-slate-600 text-xs font-semibold tracking-widest uppercase">AM Tycoon // Configuration Assistant // Made by <a href="https://su-consultancy.com" target="_blank" rel="noopener noreferrer" class="hover:underline hover:text-cyan-500 hover:transition hover:duration-300">Umut Yelbaşı</a></p>
                 </div>
             </div>
@@ -161,14 +161,14 @@
             <nav class="pt-4 mt-2"> <!-- Removed border-t -->
                 <ul class="flex space-x-8 text-base font-semibold">
                     <li>
-                        <!-- Placeholder Link: Reduced bottom padding for sleeker hover -->
-                        <a href="index.html" class="text-slate-500 hover:text-cyan-400 hover:border-b-2 hover:border-cyan-700 pb-0.5 transition duration-200">
+                        <!-- Active Link: Reduced bottom padding to pb-0.5 for a tighter border -->
+                        <a href="#" class="text-cyan-400 border-b-2 border-cyan-400 pb-0.5 transition duration-200">
                             SEAT OPTIMISER
                         </a>
                     </li>
                     <li>
-                        <!-- Active Link: Reduced bottom padding to pb-0.5 for a tighter border -->
-                        <a href="reverse-optimizer.html" class="text-cyan-400 border-b-2 border-cyan-400 pb-0.5 transition duration-200">
+                        <!-- Placeholder Link: Reduced bottom padding for sleeker hover -->
+                        <a href="reverse-optimizer.html" class="text-slate-500 hover:text-cyan-400 hover:border-b-2 hover:border-cyan-700 pb-0.5 transition duration-200">
                             REVERSE OPTIMISER
                         </a>
                     </li>
@@ -342,296 +342,558 @@
         </div>
     </div>
 
-    <script>
-        // Global Constants (Same as previous app for consistency)
-        const WEIGHT_PER_FIRST = 150; // kg (includes baggage)
-        const WEIGHT_PER_BUSINESS = 100; // kg
-        const WEIGHT_PER_ECONOMY = 80; // kg
-        const WEIGHT_PER_CARGO_TON = 1000; // kg
-
-        // Mock Aircraft Data (Payload in KG, Seats total)
-        const AIRCRAFT_DATA = [
-            { id: 'A320', model: 'Airbus A320-200', seats: 180, maxPayloadKG: 21000, price: 101.0 },
-            { id: '737MAX', model: 'Boeing 737 MAX 8', seats: 178, maxPayloadKG: 20000, price: 125.0 },
-            { id: '787-9', model: 'Boeing 787-9 Dreamliner', seats: 290, maxPayloadKG: 50000, price: 292.5 },
-            { id: 'A350-900', model: 'Airbus A350-900', seats: 300, maxPayloadKG: 60000, price: 317.4 },
-            { id: '747F', model: 'Boeing 747-400F (Cargo Only)', seats: 0, maxPayloadKG: 112760, price: 50.0 },
+    <!-- LOGIC SCRIPT (Full and complete) --><script>
+        // --- CONSTANTS ---
+        const PLANES_DB = [
+            { model: 'Custom Aircraft (Enter Below)', maxCapacity: 0, maxPayload: 0 },
+            { model: 'Aérospatiale Caravelle 12', maxCapacity: 130, maxPayload: 13.0 },
+            { model: 'Aérospatiale Concorde', maxCapacity: 128, maxPayload: 12.8 },
+            { model: 'Airbus A220-100', maxCapacity: 135, maxPayload: 15.1 },
+            { model: 'Airbus A220-300', maxCapacity: 160, maxPayload: 18.71 },
+            { model: 'Airbus A300-600R', maxCapacity: 360, maxPayload: 36.0 },
+            { model: 'Airbus A310-300', maxCapacity: 275, maxPayload: 27.5 },
+            { model: 'Airbus A318-100', maxCapacity: 136, maxPayload: 13.6 },
+            { model: 'Airbus A319-100', maxCapacity: 160, maxPayload: 16.00 },
+            { model: 'Airbus A319-100LR', maxCapacity: 160, maxPayload: 16.00 },
+            { model: 'Airbus A319neo', maxCapacity: 160, maxPayload: 16.00 },
+            { model: 'Airbus A320-200', maxCapacity: 180, maxPayload: 18.29 },
+            { model: 'Airbus A320neo', maxCapacity: 195, maxPayload: 19.65 },
+            { model: 'Airbus A321-200', maxCapacity: 220, maxPayload: 22.0 },
+            { model: 'Airbus A321XLR', maxCapacity: 244, maxPayload: 24.4 },
+            { model: 'Airbus A321neo', maxCapacity: 244, maxPayload: 24.4 },
+            { model: 'Airbus A321neo-LR', maxCapacity: 244, maxPayload: 24.9 },
+            { model: 'Airbus A330-200', maxCapacity: 406, maxPayload: 40.59 },
+            { model: 'Airbus A330-300', maxCapacity: 440, maxPayload: 56.0 },
+            { model: 'Airbus A330-800', maxCapacity: 406, maxPayload: 46.0 },
+            { model: 'Airbus A330-900', maxCapacity: 460, maxPayload: 46.0 },
+            { model: 'Airbus A340-200', maxCapacity: 420, maxPayload: 43.5 },
+            { model: 'Airbus A340-300', maxCapacity: 440, maxPayload: 44.0 },
+            { model: 'Airbus A340-500', maxCapacity: 475, maxPayload: 47.5 },
+            { model: 'Airbus A340-600', maxCapacity: 530, maxPayload: 55.6 },
+            { model: 'Airbus A350-1000', maxCapacity: 522, maxPayload: 56.1 },
+            { model: 'Airbus A350-900ULR', maxCapacity: 440, maxPayload: 44.0 },
+            { model: 'Airbus A350-900XWB', maxCapacity: 475, maxPayload: 48.0 },
+            { model: 'Airbus A380-800', maxCapacity: 853, maxPayload: 89.2 },
+            { model: 'ATR 42-500', maxCapacity: 50, maxPayload: 5.4 },
+            { model: 'ATR 42-600', maxCapacity: 50, maxPayload: 5.9 },
+            { model: 'ATR 72-500', maxCapacity: 74, maxPayload: 7.5 },
+            { model: 'ATR 72-600', maxCapacity: 74, maxPayload: 8.0 },
+            { model: 'Bae Systems Jetstream-41', maxCapacity: 30, maxPayload: 3.5 },
+            { model: 'Bae Systems RJ-85', maxCapacity: 118, maxPayload: 11.8 },
+            { model: 'Boeing 707-320C', maxCapacity: 219, maxPayload: 34.0 },
+            { model: 'Boeing 717-200', maxCapacity: 134, maxPayload: 14.5 },
+            { model: 'Boeing 737-200', maxCapacity: 136, maxPayload: 14.0 },
+            { model: 'Boeing 737-300', maxCapacity: 149, maxPayload: 16.1 },
+            { model: 'Boeing 737-400', maxCapacity: 189, maxPayload: 19.9 },
+            { model: 'Boeing 737-500', maxCapacity: 132, maxPayload: 15.2 },
+            { model: 'Boeing 737-600', maxCapacity: 132, maxPayload: 15.6 },
+            { model: 'Boeing 737-700', maxCapacity: 149, maxPayload: 17.5 },
+            { model: 'Boeing 737-700ER', maxCapacity: 149, maxPayload: 17.0 },
+            { model: 'Boeing 737-800', maxCapacity: 189, maxPayload: 20.3 },
+            { model: 'Boeing 737-800', maxCapacity: 189, maxPayload: 21.3 },
+            { model: 'Boeing 737-900ER', maxCapacity: 220, maxPayload: 23.0 },
+            { model: 'Boeing 737-MAX8', maxCapacity: 189, maxPayload: 18.9 },
+            { model: 'Boeing 737-MAX8-200', maxCapacity: 200, maxPayload: 20.0 },
+            { model: 'Boeing 737-MAX9', maxCapacity: 210, maxPayload: 22.0 },
+            { model: 'Boeing 747-100B', maxCapacity: 520, maxPayload: 52.0 },
+            { model: 'Boeing 747-200B', maxCapacity: 595, maxPayload: 68.0 },
+            { model: 'Boeing 747-300', maxCapacity: 608, maxPayload: 66.0 },
+            { model: 'Boeing 747-400', maxCapacity: 660, maxPayload: 67.50 },
+            { model: 'Boeing 747-8I', maxCapacity: 730, maxPayload: 76.0 },
+            { model: 'Boeing 757-200', maxCapacity: 239, maxPayload: 26.7 },
+            { model: 'Boeing 757-300', maxCapacity: 295, maxPayload: 31.0 },
+            { model: 'Boeing 767-200ER', maxCapacity: 290, maxPayload: 35.59 },
+            { model: 'Boeing 767-300ER', maxCapacity: 351, maxPayload: 43.8 },
+            { model: 'Boeing 767-400ER', maxCapacity: 409, maxPayload: 46.50 },
+            { model: 'Boeing 777-200', maxCapacity: 440, maxPayload: 57.4 },
+            { model: 'Boeing 777-200ER', maxCapacity: 440, maxPayload: 59.4 },
+            { model: 'Boeing 777-200LR', maxCapacity: 440, maxPayload: 64.0 },
+            { model: 'Boeing 777-300', maxCapacity: 550, maxPayload: 66.9 },
+            { model: 'Boeing 777-300ER', maxCapacity: 550, maxPayload: 69.9 },
+            { model: 'Boeing 787-10', maxCapacity: 440, maxPayload: 44.0 },
+            { model: 'Boeing 787-8', maxCapacity: 381, maxPayload: 43.3 },
+            { model: 'Boeing 787-9', maxCapacity: 420, maxPayload: 42.0 },
+            { model: 'Boeing B727-100', maxCapacity: 131, maxPayload: 13.8 },
+            { model: 'Boeing DC-3', maxCapacity: 32, maxPayload: 3.2 },
+            { model: 'Boeing DC8-55', maxCapacity: 189, maxPayload: 20.46 },
+            { model: 'Boeing DC8-73', maxCapacity: 259, maxPayload: 26.37 },
+            { model: 'Boeing MD-11', maxCapacity: 410, maxPayload: 52.6 },
+            { model: 'Boeing MD-83', maxCapacity: 167, maxPayload: 19.20 },
+            { model: 'Boeing MD-90-30', maxCapacity: 167, maxPayload: 19.00 },
+            { model: 'Bombardier CRJ-1000', maxCapacity: 104, maxPayload: 12.0 },
+            { model: 'Bombardier CRJ-200', maxCapacity: 50, maxPayload: 6.1 },
+            { model: 'Bombardier CRJ-550', maxCapacity: 57, maxPayload: 8.5 },
+            { model: 'Bombardier CRJ-700', maxCapacity: 78, maxPayload: 8.5 },
+            { model: 'Bombardier CRJ-900', maxCapacity: 90, maxPayload: 10.6 },
+            { model: 'Bombardier Q-200', maxCapacity: 40, maxPayload: 4.6 },
+            { model: 'Bombardier Q-300', maxCapacity: 56, maxPayload: 6.1 },
+            { model: 'Bombardier Q-400', maxCapacity: 80, maxPayload: 8.5 },
+            { model: 'Comac C909', maxCapacity: 90, maxPayload: 10.0 },
+            { model: 'Comac C919', maxCapacity: 174, maxPayload: 18.9 },
+            { model: 'Dassault Aviation F900-B', maxCapacity: 19, maxPayload: 2.0 },
+            { model: 'Dornier D328-100', maxCapacity: 32, maxPayload: 4.8 },
+            { model: 'Embraer E190-E2', maxCapacity: 114, maxPayload: 11.4 },
+            { model: 'Embraer E195-E2', maxCapacity: 146, maxPayload: 14.6 },
+            { model: 'Embraer EMB-120', maxCapacity: 30, maxPayload: 3.3 },
+            { model: 'Embraer ERJ-135', maxCapacity: 37, maxPayload: 4.5 },
+            { model: 'Embraer ERJ-140', maxCapacity: 44, maxPayload: 5.3 },
+            { model: 'Embraer ERJ-145', maxCapacity: 50, maxPayload: 5.8 },
+            { model: 'Embraer ERJ-145XR', maxCapacity: 50, maxPayload: 6.0 },
+            { model: 'Embraer ERJ-170', maxCapacity: 80, maxPayload: 9.8 },
+            { model: 'Embraer ERJ-175', maxCapacity: 88, maxPayload: 10.4 },
+            { model: 'Embraer ERJ-190', maxCapacity: 114, maxPayload: 13.1 },
+            { model: 'Embraer ERJ-195', maxCapacity: 124, maxPayload: 13.6 },
+            { model: 'Fokker F-100', maxCapacity: 122, maxPayload: 12.2 },
+            { model: 'Gulfstream G650', maxCapacity: 19, maxPayload: 2.9 },
+            { model: 'Ilyushin Il-114', maxCapacity: 64, maxPayload: 6.5 },
+            { model: 'Ilyushin Il-96-300', maxCapacity: 300, maxPayload: 40.0 },
+            { model: 'Ilyushin Il-96M', maxCapacity: 436, maxPayload: 45.0 },
+            { model: 'IPTN CN-235', maxCapacity: 44, maxPayload: 4.5 },
+            { model: 'Lockheed L-100', maxCapacity: 128, maxPayload: 23.2 },
+            { model: 'Lockheed L-1011-200', maxCapacity: 400, maxPayload: 46.0 },
+            { model: 'Lockheed L-1011-500', maxCapacity: 330, maxPayload: 41.0 },
+            { model: 'Lockheed L-1049G', maxCapacity: 106, maxPayload: 12.0 },
+            { model: 'Saab S-2000', maxCapacity: 58, maxPayload: 5.9 },
+            { model: 'Saab S-340B', maxCapacity: 37, maxPayload: 3.7 },
+            { model: 'Sukhoi SSJ-100-95', maxCapacity: 98, maxPayload: 12.2 },
+            { model: 'Tupolev TU-214-210', maxCapacity: 210, maxPayload: 25.20 },
         ];
 
-        let selectedAircraft = AIRCRAFT_DATA[3]; // Default to A350-900 (300 seats)
+        let selectedPlaneIndex = 0; // Default to 'Custom Aircraft'
+
+        // --- CORE LOGIC CONSTANTS ---
+        const MAX_DAY_MINUTES = 24 * 60; // 1440 minutes
+        const FIXED_WAVES = 10; // Fixed number of rows when duration limit is off
+
+        // NEW PHYSICS CONSTANTS
+        const SEAT_WEIGHTS = {
+          E: 0.1,          /* Economy seat weight (Tonnes) */
+          B: 0.12498942917, /* Business seat weight (Tonnes) - High Precision */
+          F: 0.15,         /* First seat weight (Tonnes) */
+          C: 1,            /* Cargo unit weight (Tonnes) */
+        };
+
+        const SEAT_SPACE_MULTIPLIERS = {
+          E: 1,
+          B: 1.80338266394,
+          F: 4.20197044351,
+        };
+
+        // --- DOM REFERENCES ---
+        const planeSelector = document.getElementById('planeSelector');
+        const planeDropdown = document.getElementById('planeDropdown');
+        const planeList = document.getElementById('planeList');
+        const planeSearch = document.getElementById('planeSearch');
+        const selectedPlaneName = document.getElementById('selectedPlaneName');
+        const inputCapacity = document.getElementById('inputCapacity');
+        const inputPayload = document.getElementById('inputPayload');
+        const customHint = document.getElementById('customHint');
+        const resultsBody = document.getElementById('resultsBody');
+        const hoursInput = document.getElementById('hoursInput');
+        const minutesInput = document.getElementById('minutesInput');
+        const durationSummary = document.getElementById('durationSummary');
+        const durationToggle = document.getElementById('durationToggle'); 
+        const durationContent = document.getElementById('durationContent'); // Reference to the hours/minutes section
+        
+        const demandInputs = ['demandEco', 'demandBus', 'demandFirst', 'demandCargo'].map(id => document.getElementById(id));
+        const allInputs = [inputCapacity, inputPayload, ...demandInputs, hoursInput, minutesInput, durationToggle];
 
         /**
-         * Safely displays a message to the user.
+         * Converts total minutes to "Hh Mm" format.
          */
-        function showMessage(message, type = 'error') {
-            const box = document.getElementById('messageBox');
-            if (!box) return;
-
-            box.className = 'mt-6 p-3 text-sm rounded-lg';
-            box.classList.remove('hidden');
-
-            if (type === 'error') {
-                box.classList.add('text-red-700', 'bg-red-100');
-            } else {
-                box.classList.add('text-green-700', 'bg-green-100');
-            }
-
-            box.innerHTML = message;
-            
-            setTimeout(() => {
-                box.classList.add('hidden');
-            }, 8000);
+        function formatDuration(totalMinutes) {
+            if (totalMinutes < 0) return "0h 0m";
+            const hours = Math.floor(totalMinutes / 60);
+            const minutes = totalMinutes % 60;
+            return `${hours}h ${minutes}m`;
         }
 
         /**
-         * Selects an aircraft, updates max capacity display, and triggers calculation.
+         * Calculates the optimal seat configuration for a single demand type based on user-specified rules.
          */
-        function selectAircraft(aircraftId) {
-            const newSelection = AIRCRAFT_DATA.find(a => a.id === aircraftId);
-            if (!newSelection) {
-                showMessage(`Aircraft ID ${aircraftId} not found.`, 'error');
+        function calculateRequiredSeats(rawDemand, totalPassengerSlots) {
+            if (rawDemand <= 0) return 0;
+            if (totalPassengerSlots <= 0) return rawDemand; 
+            
+            // 1. Adjust Demand for Odd Numbers
+            let adjustedDemand = rawDemand - (rawDemand % 2); 
+            if (adjustedDemand < 0) adjustedDemand = 0;
+            
+            // 2. Calculate required capacity (can be fractional)
+            const requiredCapacity = adjustedDemand / totalPassengerSlots;
+
+            // 3. Apply the Zero Threshold/Rounding Down Logic
+            if (requiredCapacity === 0) {
+                return 0;
+            } else if (requiredCapacity < 1) {
+                // If the required capacity is fractional but less than 1 
+                return 0;
+            } else {
+                // Use Math.floor() to round the fractional seat number down 
+                // to the nearest whole number, as requested.
+                return Math.floor(requiredCapacity);
+            }
+        }
+
+        /**
+         * Toggles the visibility of the duration inputs and summary based on the toggle state.
+         * @param {boolean} isActive - True if the 24H limit toggle is ON.
+         */
+        function toggleDurationInputs(isActive) {
+            // Toggle visibility using the defined fade-in/fade-out classes
+            durationContent.classList.toggle('fade-out', !isActive);
+            durationContent.classList.toggle('fade-in', isActive);
+            
+            durationSummary.classList.toggle('fade-out', !isActive);
+            durationSummary.classList.toggle('fade-in', isActive);
+        }
+
+        /**
+         * Calculates the optimal seat configurations and updates the table.
+         */
+        function calculateSeats() {
+            // 1. INPUT GATHERING
+            const planeCapacity = parseInt(inputCapacity.value) || 0;
+            const planePayload = parseFloat(inputPayload.value) || 0;
+            const durationHours = parseInt(hoursInput.value) || 0;
+            const durationMinutes = parseInt(minutesInput.value) || 0;
+            const isDurationLimitActive = durationToggle.checked;
+            
+            const totalFlightMinutes = (durationHours * 60) + durationMinutes;
+
+            const demand = {
+                eco: parseInt(document.getElementById('demandEco').value) || 0,
+                bus: parseInt(document.getElementById('demandBus').value) || 0,
+                first: parseInt(document.getElementById('demandFirst').value) || 0,
+                cargo: parseFloat(document.getElementById('demandCargo').value) || 0,
+            };
+            
+            // Update UI visibility based on toggle state
+            toggleDurationInputs(isDurationLimitActive);
+
+            // Clear previous results
+            resultsBody.innerHTML = '';
+            
+            if (planeCapacity <= 0 || planePayload <= 0) {
+                // Update summary even if hidden, just in case user toggles it back
+                document.querySelector('#durationSummary > div').innerHTML = `<p class="text-red-400">Please set valid input values for Aircraft (capacity > 0).</p>`;
+                resultsBody.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="p-4 text-slate-500 italic">
+                            <i data-lucide="alert-triangle" class="w-4 h-4 inline mr-1 align-sub"></i> 
+                            Please set a valid aircraft (capacity > 0).
+                        </td>
+                    </tr>
+                `;
+                lucide.createIcons();
                 return;
             }
-            selectedAircraft = newSelection;
-            document.getElementById('selectedPlaneName').textContent = selectedAircraft.model;
-            document.getElementById('planeDropdown').classList.add('hidden');
-            
-            // Update max capacity display
-            document.getElementById('maxCapacity').textContent = selectedAircraft.seats.toLocaleString();
-            
-            // If Cargo-only, clear seat inputs
-            if (selectedAircraft.seats === 0) {
-                document.getElementById('configFirst').value = 0;
-                document.getElementById('configBusiness').value = 0;
-                document.getElementById('configEconomy').value = 0;
-                document.getElementById('configFirst').disabled = true;
-                document.getElementById('configBusiness').disabled = true;
-                document.getElementById('configEconomy').disabled = true;
+
+            // 2. Determine Max Waves (Legs) to Display based on toggle
+            const maxPossibleWavesBasedOnTime = Math.floor(MAX_DAY_MINUTES / totalFlightMinutes);
+            let maxWavesToDisplay;
+
+            if (isDurationLimitActive) {
+                maxWavesToDisplay = maxPossibleWavesBasedOnTime;
             } else {
-                document.getElementById('configFirst').disabled = false;
-                document.getElementById('configBusiness').disabled = false;
-                document.getElementById('configEconomy').disabled = false;
+                // Toggle OFF: Fixed 10 rows
+                maxWavesToDisplay = FIXED_WAVES;
             }
 
-            updateSeatSum(); // Also runs the main calculation
-        }
+            // Update Duration Summary
+            const flightDurationString = formatDuration(totalFlightMinutes);
+            let summaryHtml = ``;
+            const summaryContainer = document.querySelector('#durationSummary > div');
 
-        /**
-         * Populates the aircraft selection dropdown.
-         */
-        function populateDropdown() {
-            const dropdown = document.getElementById('planeDropdown');
-            dropdown.innerHTML = '';
 
-            AIRCRAFT_DATA.forEach(plane => {
-                const item = document.createElement('div');
-                item.className = 'px-4 py-2 cursor-pointer hover:bg-indigo-100 transition duration-100 text-sm text-gray-800';
-                item.textContent = `${plane.model} (Max Seats: ${plane.seats})`;
-                item.onclick = () => selectAircraft(plane.id);
-                dropdown.appendChild(item);
-            });
-        }
+            if (isDurationLimitActive) {
+                 if (totalFlightMinutes <= 0) {
+                     summaryHtml = `<p class="text-red-400">Please set a valid flight duration (> 0 minutes).</p>`;
+                 } else {
+                    summaryHtml = `
+                        <p>Return Trip Duration: <span class="text-cyan-400 font-mono">${flightDurationString}</span></p>
+                        <p class="pt-1 text-base text-white">Max Return Trips in 24h: <span class="text-lg font-bold text-cyan-400">${maxWavesToDisplay}</span></p>
+                        <p class="text-[10px] text-cyan-400 pt-2 font-semibold tracking-wide">
+                            // Display limited by 24h cycle.
+                        </p>
+                    `;
+                 }
+            } else {
+                summaryHtml = `
+                    <p class="pt-1 text-base text-white">Analysis Waves: <span class="text-lg font-bold text-white">${FIXED_WAVES}</span></p>
+                    <p class="text-[10px] text-red-400 pt-2 font-semibold tracking-wide">
+                        // Fixed ${FIXED_WAVES}-wave analysis, 24H limit DISABLED.
+                    </p>
+                `;
+            }
 
-        /**
-         * Core logic to calculate the minimum number of aircraft needed.
-         */
-        function calculateAircraftNeeded() {
-            // --- 1. GET INPUTS (Demand and Single-Plane Configuration) ---
-            const demandF = parseFloat(document.getElementById('totalFirstClassDemand').value) || 0;
-            const demandB = parseFloat(document.getElementById('totalBusinessClassDemand').value) || 0;
-            const demandE = parseFloat(document.getElementById('totalEconomyClassDemand').value) || 0;
-            const demandCargoT = parseFloat(document.getElementById('totalCargoDemand').value) || 0;
+            summaryContainer.innerHTML = summaryHtml;
 
-            // Single-plane seat configuration
-            const configF = parseFloat(document.getElementById('configFirst').value) || 0;
-            const configB = parseFloat(document.getElementById('configBusiness').value) || 0;
-            const configE = parseFloat(document.getElementById('configEconomy').value) || 0;
-            
-            const totalConfigSeats = configF + configB + configE;
-            const planeMaxSeats = selectedAircraft.seats;
-
-            // --- 2. VALIDATION CHECKS ---
-            
-            if (totalConfigSeats > planeMaxSeats) {
-                showMessage(`The configured seats (${totalConfigSeats}) exceed the selected aircraft's maximum capacity (${planeMaxSeats}). Please reduce the seat count.`, 'error');
-                document.getElementById('aircraftNeeded').textContent = 'ERROR';
-                document.getElementById('limitingFactor').textContent = 'Invalid Config';
-                document.getElementById('breakdownOutput').innerHTML = '<p class="text-red-500">Configuration exceeds aircraft capacity.</p>';
+            // Check for unfeasible duration only if the limit is active and input is positive
+            if (isDurationLimitActive && totalFlightMinutes > 0 && maxWavesToDisplay < 1) {
+                 resultsBody.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="p-4 text-red-500 italic">
+                            <i data-lucide="x-octagon" class="w-4 h-4 inline mr-1 align-sub"></i> 
+                            Flight duration (${flightDurationString}) is longer than 24 hours.
+                        </td>
+                    </tr>
+                `;
+                lucide.createIcons();
                 return;
+            } else if (totalFlightMinutes <= 0 && isDurationLimitActive) {
+                 // Prevent table render if duration is 0 and limit is active
+                 return;
             }
-            
-            if (planeMaxSeats === 0 && (configF > 0 || configB > 0 || configE > 0)) {
-                 showMessage(`Selected aircraft (${selectedAircraft.model}) is Cargo-only and cannot carry any configured passenger seats.`, 'error');
-                 // Don't error out, but set config seats to zero and proceed with cargo check
-                 // For the UI, we already disabled inputs, so this is just a final check.
-            }
-            
-            const totalRequiredPassengers = demandF + demandB + demandE;
-            const totalCargoWeightKG = demandCargoT * WEIGHT_PER_CARGO_TON;
-            
-            // --- 3. CALCULATE WEIGHT OF ONE FULLY CONFIGURED AIRCRAFT ---
-            // Calculate the total weight (Pax + Baggage) for a single, fully loaded configured aircraft
-            const configuredPaxWeightKG = (configF * WEIGHT_PER_FIRST) + 
-                                          (configB * WEIGHT_PER_BUSINESS) + 
-                                          (configE * WEIGHT_PER_ECONOMY);
-            
-            // We assume the non-passenger payload (cargo capacity) of a single flight is the maximum payload
-            // minus the weight taken up by the configured passengers.
-            const availableCargoPayloadKG = selectedAircraft.maxPayloadKG - configuredPaxWeightKG;
 
-            // --- 4. CALCULATE PLANES REQUIRED FOR EACH CONSTRAINT ---
 
-            // A. Planes required by total passenger seats (Capacity Constraint)
-            // Divide total demand passengers by the number of seats available in the configured plane.
-            const planesNeededBySeats = (totalConfigSeats > 0) 
-                ? Math.ceil(totalRequiredPassengers / totalConfigSeats) 
-                : (totalRequiredPassengers > 0 ? Infinity : 0);
+            const rowsHtml = [];
 
-            // B. Planes required by total cargo demand (Payload Constraint)
-            // Divide total cargo demand by the cargo capacity available in one configured plane.
-            let planesNeededByPayload = 0;
-            if (totalCargoWeightKG > 0) {
-                if (availableCargoPayloadKG <= 0) {
-                    // Cannot carry any cargo with this configuration
-                    planesNeededByPayload = Infinity;
+            // 3. ITERATE AND CALCULATE FOR EACH WAVE COUNT
+            for (let waves = 1; waves <= maxWavesToDisplay && waves <= 100; waves++) {
+                
+                // Total slots provided by one seat over all waves = waves * 2 (one RT trip per wave)
+                const totalPassengerSlots = waves * 2; 
+
+                // Calculate required seats using the new user-defined logic
+                const required = {
+                    eco: calculateRequiredSeats(demand.eco, totalPassengerSlots),
+                    bus: calculateRequiredSeats(demand.bus, totalPassengerSlots),
+                    first: calculateRequiredSeats(demand.first, totalPassengerSlots),
+                    // Cargo remains standard: Daily RT Cargo Demand / Total One-Way Legs (waves)
+                    cargo: (demand.cargo / waves), 
+                };
+                
+                // --- CAPACITY CHECK (Physical Space) ---
+                // Total required capacity in terms of Economy-Equivalent seats
+                const totalRequiredCapacityEquivalent = 
+                    (required.eco * SEAT_SPACE_MULTIPLIERS.E) +
+                    (required.bus * SEAT_SPACE_MULTIPLIERS.B) +
+                    (required.first * SEAT_SPACE_MULTIPLIERS.F);
+
+                // --- PAYLOAD CHECK (Total Weight) ---
+                const requiredPayload = 
+                    (required.eco * SEAT_WEIGHTS.E) +
+                    (required.bus * SEAT_WEIGHTS.B) +
+                    (required.first * SEAT_WEIGHTS.F) +
+                    (required.cargo * SEAT_WEIGHTS.C);
+
+                // Check if any passenger class requires 0 seats
+                const hasZeroSeats = required.eco === 0 && required.bus === 0 && required.first === 0;
+
+                // --- VALIDATION & STYLING LOGIC ---
+                let validationIcon = 'check';
+                let validationColor = 'text-emerald-400';
+                let validationText = 'Valid';
+                let rowClass = 'text-slate-300';
+                let hoverClass = 'hover:bg-white/5';
+
+                if (hasZeroSeats) {
+                    // Precedence 1: LOW DEMAND (Greyed out) - Fades row text to slate-600
+                    validationIcon = 'info';
+                    validationColor = 'text-slate-500';
+                    validationText = 'LOW DEMAND'; 
+                    rowClass = 'text-slate-600 bg-black/10 italic'; 
+                    hoverClass = 'hover:bg-black/20';
                 } else {
-                    planesNeededByPayload = Math.ceil(totalCargoWeightKG / availableCargoPayloadKG);
+                    // Precedence 2: Capacity/Payload Check
+                    const isCapacityValid = totalRequiredCapacityEquivalent <= planeCapacity;
+                    const isPayloadValid = requiredPayload <= planePayload;
+                    
+                    if (!isCapacityValid || !isPayloadValid) { 
+                        validationIcon = 'x';
+                        validationColor = 'text-red-500';
+                        validationText = (!isCapacityValid && !isPayloadValid) ? 'BOTH' : (!isCapacityValid ? 'CAPACITY' : 'PAYLOAD');
+                        
+                        // FADE OUT: Apply opacity-60 to the entire row if invalid
+                        rowClass = 'text-slate-500 opacity-60'; 
+                        hoverClass = 'hover:opacity-100 hover:bg-red-950/20'; // Highlight on hover
+                    }
                 }
-            }
+                
+                // --- Payload Bar Calculation ---
+                // Payload Bar
+                const payloadUsageRawPercent = (requiredPayload / planePayload) * 100;
+                const payloadBarColor = getBarColor(payloadUsageRawPercent);
+                // The width should be capped at 100% for visual purposes
+                const payloadBarWidthPercent = Math.min(100, payloadUsageRawPercent);
 
 
-            // --- 5. DETERMINE FINAL FLEET SIZE AND LIMITING FACTOR ---
-            
-            // Max is taken from the three constraints: Passenger Demand, Cargo Demand, or minimum 1 if any demand exists
-            const finalAircraftNeeded = Math.max(planesNeededBySeats, planesNeededByPayload, 
-                (totalRequiredPassengers > 0 || demandCargoT > 0 ? 1 : 0));
-            
-            let limitingFactor;
-            if (finalAircraftNeeded === 0) {
-                limitingFactor = 'Zero Demand';
-            } else if (planesNeededByPayload > planesNeededBySeats) {
-                limitingFactor = `Cargo/Payload Constraint`;
-            } else if (planesNeededBySeats > planesNeededByPayload) {
-                limitingFactor = `Passenger Seat Constraint`;
-            } else {
-                limitingFactor = `Seats & Payload Equal`;
-            }
-            
-            // --- 6. CALCULATE UTILIZATION (for the limiting factor plane count) ---
-            
-            // Total capacity of the fleet
-            const totalFleetConfigSeats = finalAircraftNeeded * totalConfigSeats;
-            const totalFleetAvailableCargoPayloadKG = finalAircraftNeeded * availableCargoPayloadKG;
-            
-            // Utilization
-            const capacityUtilization = (totalFleetConfigSeats > 0) ? (totalRequiredPassengers / totalFleetConfigSeats) * 100 : 0;
-            const payloadUtilization = (totalFleetAvailableCargoPayloadKG > 0) ? (totalCargoWeightKG / totalFleetAvailableCargoPayloadKG) * 100 : 0;
-            
+                // Capacity Bar
+                const capacityUsageRawPercent = (totalRequiredCapacityEquivalent / planeCapacity) * 100;
+                const capacityBarColor = getBarColor(capacityUsageRawPercent);
+                // The width should be capped at 100% for visual purposes
+                const capacityBarWidthPercent = Math.min(100, capacityUsageRawPercent);
 
-            // --- 7. UPDATE UI ---
-            
-            // Main Results
-            document.getElementById('aircraftNeeded').textContent = finalAircraftNeeded.toLocaleString();
-            document.getElementById('limitingFactor').textContent = limitingFactor;
-            
-            document.getElementById('utilizationSummary').textContent = 
-                `${capacityUtilization.toFixed(1)}% / ${payloadUtilization.toFixed(1)}%`;
-            
-            // Detailed Breakdown
-            const breakdownHtml = `
-                <p><strong>Configured Seats (Per Plane):</strong> F:${configF}, B:${configB}, E:${configE} (Total: ${totalConfigSeats})</p>
-                <p><strong>Configured Payload Usage (Per Plane):</strong> ${(configuredPaxWeightKG / 1000).toFixed(2)} T for Passengers</p>
-                <p><strong>Available Cargo Payload (Per Plane):</strong> ${(availableCargoPayloadKG / 1000).toFixed(2)} T</p>
-                <hr class="my-2 border-gray-300">
-                <p class="text-indigo-600"><strong>Planes required by Passenger Demand:</strong> ${planesNeededBySeats.toFixed(2)} (Rounded Up: ${Math.ceil(planesNeededBySeats)})</p>
-                <p class="text-indigo-600"><strong>Planes required by Cargo Demand:</strong> ${planesNeededByPayload.toFixed(2)} (Rounded Up: ${Math.ceil(planesNeededByPayload)})</p>
-                <hr class="my-2 border-gray-300">
-                <p class="font-bold">Total Seats in Fleet (${finalAircraftNeeded}x): ${totalFleetConfigSeats.toLocaleString()} configured seats</p>
-                <p class="font-bold">Total Cargo Capacity in Fleet (${finalAircraftNeeded}x): ${(totalFleetAvailableCargoPayloadKG / 1000).toFixed(2)} Tons</p>
-            `;
-            document.getElementById('breakdownOutput').innerHTML = breakdownHtml;
-            
+                // --- Generate HTML Row ---
+                const row = `
+                    <tr class="${rowClass} ${hoverClass} transition-colors duration-200">
+                        <td class="p-3 text-cyan-400 font-semibold">${waves}</td>
+                        <td class="p-3">${required.eco.toLocaleString()}</td>
+                        <td class="p-3">${required.bus.toLocaleString()}</td>
+                        <td class="p-3">${required.first.toLocaleString()}</td>
+                        <td class="p-3 text-amber-500">${required.cargo.toFixed(2)}</td>
+                        
+                        <!-- PAYLOAD BAR -->
+                        <td class="p-3 font-bold">
+                            ${requiredPayload.toFixed(2)}
+                            <span class="text-[10px] font-normal text-gray-500">/${planePayload.toFixed(2)}</span>
+                            <div class="w-full h-1 bg-slate-800 rounded-full mt-1 overflow-hidden">
+                            <div class="h-1 ${payloadBarColor} transition-all duration-500" style="width: ${payloadBarWidthPercent}%;"></div>
+                            </div>
+                        </td>
+
+                        <!-- CAPACITY BAR -->
+                        <td class="p-3 font-bold">
+                            ${totalRequiredCapacityEquivalent.toFixed(2)}
+                            <span class="text-[10px] font-normal text-gray-500">/${planeCapacity.toFixed(2)}</span>
+                            <div class="w-full h-1 bg-slate-800 rounded-full mt-1 overflow-hidden">
+                            <div class="h-1 ${capacityBarColor} transition-all duration-500" style="width: ${capacityBarWidthPercent}%;"></div>
+                            </div>
+                        </td>
+
+                        <td class="p-3 font-bold ${validationColor} flex items-center justify-center gap-1 min-h-[50px] uppercase">
+                            <i data-lucide="${validationIcon}" class="w-4 h-4"></i>
+                            <span class="text-[10px]">${validationText}</span>
+                        </td>
+                    </tr>
+                `;
+                rowsHtml.push(row);
+            } // End of wave loop
+
+            resultsBody.innerHTML = rowsHtml.join('');
+            lucide.createIcons(); // Re-render icons after DOM update
         }
 
+        // --- UI & EVENT HANDLERS ---
+        
         /**
-         * Updates the configured seat sum display and triggers calculation.
+         * Populates the aircraft dropdown list.
          */
-        function updateSeatSum() {
-            const configF = parseFloat(document.getElementById('configFirst').value) || 0;
-            const configB = parseFloat(document.getElementById('configBusiness').value) || 0;
-            const configE = parseFloat(document.getElementById('configEconomy').value) || 0;
-            
-            const currentSum = configF + configB + configE;
-            const maxSeats = selectedAircraft.seats;
-            const sumElement = document.getElementById('currentSeatSum');
-            
-            sumElement.textContent = currentSum.toLocaleString();
-            
-            if (currentSum > maxSeats) {
-                sumElement.classList.remove('text-green-600');
-                sumElement.classList.add('text-red-600');
-            } else {
-                sumElement.classList.remove('text-red-600');
-                sumElement.classList.add('text-green-600');
-            }
-            
-            calculateAircraftNeeded();
-        }
+        function setupPlaneDropdown() {
+            planeList.innerHTML = PLANES_DB.map((plane, index) => `
+                <div 
+                    class="plane-option px-3 py-2 cursor-pointer hover:bg-cyan-700/20 hover:text-cyan-200 text-sm transition-colors duration-150 truncate" 
+                    data-index="${index}"
+                >
+                    ${plane.model}
+                </div>
+            `).join('');
 
-        /**
-         * Initializes event listeners and runs the initial calculation.
-         */
-        function init() {
-            populateDropdown();
-            selectAircraft(selectedAircraft.id); // Initial default selection
-
-            // Input fields for total demand
-            const demandInputs = [
-                'totalFirstClassDemand', 'totalBusinessClassDemand', 'totalEconomyClassDemand', 'totalCargoDemand'
-            ];
-            
-            // Input fields for single-plane configuration
-            const configInputs = ['configFirst', 'configBusiness', 'configEconomy'];
-
-            // Attach listeners to all demand inputs
-            demandInputs.forEach(id => {
-                const element = document.getElementById(id);
-                if (element) {
-                    element.addEventListener('input', calculateAircraftNeeded);
-                }
-            });
-            
-            // Attach listeners to configuration inputs (updates sum and calculates fleet size)
-            configInputs.forEach(id => {
-                const element = document.getElementById(id);
-                if (element) {
-                    element.addEventListener('input', updateSeatSum);
-                }
-            });
-
-            // Handle dropdown toggle
-            const planeSelectButton = document.getElementById('planeSelectButton');
-            const planeDropdown = document.getElementById('planeDropdown');
-            if (planeSelectButton && planeDropdown) {
-                planeSelectButton.addEventListener('click', () => {
-                    planeDropdown.classList.toggle('hidden');
+            document.querySelectorAll('.plane-option').forEach(option => {
+                option.addEventListener('click', (e) => {
+                    selectedPlaneIndex = parseInt(e.target.dataset.index);
+                    const plane = PLANES_DB[selectedPlaneIndex];
+                    selectedPlaneName.textContent = plane.model;
+                    planeDropdown.classList.add('hidden');
+                    updateCapacityInputs();
                 });
+            });
+        }
+        
+        /**
+         * Sets input fields based on the selected aircraft.
+         */
+        function updateCapacityInputs() {
+            const plane = PLANES_DB[selectedPlaneIndex];
+            
+            // Note: capacity is integer, payload is float.
+            const isCustom = selectedPlaneIndex === 0;
+
+            inputCapacity.disabled = !isCustom;
+            inputPayload.disabled = !isCustom;
+            
+            customHint.classList.toggle('hidden', !isCustom);
+            
+            if (!isCustom) {
+                // Use plane's actual stats
+                inputCapacity.value = plane.maxCapacity;
+                inputPayload.value = plane.maxPayload.toFixed(2);
+                customHint.textContent = '// PLANE STATS LOCKED';
+            } else {
+                // Keep default custom values or user-entered values
+                customHint.textContent = '// MANUAL OVERRIDE ENABLED';
             }
 
+            calculateSeats(); // Trigger calculation when plane changes
+        }
+        
+        /**
+         * Populates the hours dropdown from 1 to 24.
+         */
+        function setupDurationInputs() {
+            for (let h = 1; h <= 24; h++) {
+                const option = document.createElement('option');
+                option.value = h;
+                option.textContent = h.toString().padStart(2, '0');
+                hoursInput.appendChild(option);
+            }
+            // Set default duration to a common flight time (e.g., 8h 00m)
+            hoursInput.value = 8; 
+        }
+
+        function getBarColor(value) {
+            // Ensure value is a number and clamp it between 0 and 100
+            const percentage = Math.max(0, Math.min(100, parseFloat(value) || 0));
+
+            if (percentage >= 95) {
+                return 'bg-red-600'; // Excellent
+            } else if (percentage >= 80) {
+                return 'bg-yellow-400'; // Good/Warning
+            } else if (percentage >= 50) {
+                return 'bg-amber-500'; // Needs attention
+            } else {
+                return 'bg-green-600'; // Poor
+            }
+        }
+
+        // --- INITIALIZATION ---
+        function init() {
+            lucide.createIcons(); // Initialize all icons
+
+            // Setup inputs
+            setupPlaneDropdown();
+            setupDurationInputs();
+            
+            // Set initial state
+            selectedPlaneName.textContent = PLANES_DB[0].model; // Set initial text to Custom
+            
+            // Event listeners for calculation triggers
+            allInputs.forEach(input => {
+                // Use 'change' for select/checkbox, 'input' for text/number
+                const eventType = (input.type === 'checkbox' || input.tagName === 'SELECT') ? 'change' : 'input';
+                input.addEventListener(eventType, calculateSeats);
+            });
+            
+            // Event Listeners for UI interaction
+            planeSelector.addEventListener('click', () => {
+                planeDropdown.classList.toggle('hidden');
+                planeSearch.value = '';
+                planeSearch.focus();
+                // Show all options on toggle
+                document.querySelectorAll('.plane-option').forEach(el => el.classList.remove('hidden'));
+            });
+
+            planeSearch.addEventListener('input', (e) => {
+                const filter = e.target.value.toLowerCase();
+                document.querySelectorAll('.plane-option').forEach(option => {
+                    const model = option.textContent.toLowerCase();
+                    option.classList.toggle('hidden', !model.includes(filter));
+                });
+            });
+            
             // Close dropdown when clicking outside
             document.addEventListener('click', (e) => {
-                if (planeDropdown && !planeSelectButton.contains(e.target) && !planeDropdown.contains(e.target)) {
+                if (!planeSelector.contains(e.target) && !planeDropdown.contains(e.target)) {
                     planeDropdown.classList.add('hidden');
                 }
             });
             
-            // Initial setup
-            updateSeatSum(); 
+            // Initial calculation and UI setup
+            calculateSeats();
         }
 
-        // Wait for the entire page to load before running initialization code
-        window.addEventListener('load', init);
-
+        window.onload = init;
     </script>
 </body>
 </html>
