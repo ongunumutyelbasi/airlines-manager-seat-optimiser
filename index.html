@@ -677,11 +677,34 @@
                 
                 // --- Payload Bar Calculation ---
                 // Calculate percentage based on aircraft's max payload
-                const payloadUsedPercent = Math.min(100, (requiredPayload / planePayload) * 100);
-                const payloadBarColor = payloadUsedPercent > 100 ? 'bg-red-500' : 'bg-amber-500';
+                const rawPayloadUtilization = requiredPayload / planePayload; 
+        
+                // 2. Clamped percentage for bar visual (max 100%)
+                const payloadUsedPercent = Math.min(100, rawPayloadUtilization * 100);
+                
+                let payloadBarColor;
+                if (rawPayloadUtilization > 1) {
+                    payloadBarColor = 'bg-red-500'; // > 100%
+                } else if (rawPayloadUtilization >= 0.7) {
+                    payloadBarColor = 'bg-amber-500'; // 70% to 100%
+                } else {
+                    payloadBarColor = 'bg-green-500'; // < 70%
+                }
 
-                const capacityUsedPercent = Math.min(100, (totalRequiredCapacityEquivalent / planeCapacity) * 100);
-                const capacityBarColor = capacityUsedPercent > 100 ? 'bg-red-500' : 'bg-amber-500';
+                // 1. Raw ratio for color determination (can be > 1.0)
+                const rawCapacityUtilization = requiredCapacity / planeCapacity; 
+                
+                // 2. Clamped percentage for bar visual (max 100%)
+                const capacityUsedPercent = Math.min(100, rawCapacityUtilization * 100);
+                
+                let capacityBarColor;
+                if (rawCapacityUtilization > 1) {
+                    capacityBarColor = 'bg-red-500'; // > 100%
+                } else if (rawCapacityUtilization >= 0.7) {
+                    capacityBarColor = 'bg-amber-500'; // 70% to 100%
+                } else {
+                    capacityBarColor = 'bg-green-500'; // < 70%
+                }
 
                 // --- Generate HTML Row ---
                 const row = `
