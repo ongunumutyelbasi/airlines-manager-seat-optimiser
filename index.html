@@ -796,6 +796,21 @@
             hoursInput.value = 8; 
         }
 
+        function getBarColor(value) {
+            // Ensure value is a number and clamp it between 0 and 100
+            const percentage = Math.max(0, Math.min(100, parseFloat(value) || 0));
+
+            if (percentage >= 95) {
+                return 'bg-green-600'; // Excellent
+            } else if (percentage >= 80) {
+                return 'bg-amber-400'; // Good/Warning
+            } else if (percentage >= 50) {
+                return 'bg-yellow-500'; // Needs attention
+            } else {
+                return 'bg-red-600'; // Poor
+            }
+        }
+
         // --- INITIALIZATION ---
         function init() {
             lucide.createIcons(); // Initialize all icons
