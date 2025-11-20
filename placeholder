@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fleet Sizing & Demand Fulfilment</title>
+    
+    <!-- Tailwind CSS --><script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Lucide Icons --><script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Google Fonts: Rajdhani for that futuristic HUD look --><link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Hide spin buttons in Firefox */
+        input[type="number"] {
+            -moz-appearance: textfield;
+        }
+        
+        /* Typography Override */
+        body {
+            font-family: 'Rajdhani', sans-serif;
+        }
+
+        /* Background Pattern */
+        .bg-grid-pattern {
+            /* The base background color is set by Tailwind bg-[#050508] in the body tag */
+            background: 
+                linear-gradient(to right, #ffffff08 1px, transparent 1px) 0 0,
+                linear-gradient(to bottom, #ffffff08 1px, transparent 1px) 0 0;
+            background-size: 20px 20px;
+            background-repeat: repeat; /* Explicitly set repeat */
+        }
+        
+        /* The body class still needs to manage the background color */
+        body.bg-grid-pattern {
+            background-color: #050508;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f172a; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #22d3ee;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #67e8f9;
+        }
+
+        /* Toggle Switch */
+        .toggle-checkbox {
+            position: absolute;
+            left: 0;
+            margin: 0;
+            padding: 0;
+            opacity: 0; /* Hide native checkbox */
+        }
+        .toggle-label {
+            position: relative;
+            display: block;
+            width: 40px;
+            height: 20px;
+            border-radius: 10px;
+            background-color: #334155;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .toggle-label::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background-color: white;
+            transition: all 0.3s;
+        }
+        .toggle-checkbox:checked + .toggle-label {
+            background-color: #22d3ee;
+            box-shadow: 0 0 8px rgba(34, 211, 238, 0.4);
+        }
+        .toggle-checkbox:checked + .toggle-label::after {
+            transform: translateX(20px);
+        }
+
+        /* Disabled Input Styling */
+        input:disabled {
+            background-color: transparent;
+            border-color: transparent;
+            color: #64748b;
+            cursor: not-allowed;
+            padding-left: 0;
+            text-align: right;
+        }
+
+        /* Neon Glow Effects */
+        .glow-text {
+            text-shadow: 0 0 3px rgba(34, 211, 238, 0.3);
+        }
+        .glow-border:focus-within {
+            box-shadow: 0 0 10px rgba(34, 211, 238, 0.15);
+            border-color: #22d3ee;
+        }
+        
+        /* Table Styling Overrides: Remove vertical borders (dividers) */
+        th, td {
+            border-right: none !important; /* Forces removal of Tailwind's border-r classes */
+        }
+        thead th {
+            border-left: none !important;
+            border-right: none !important;
+        }
+
+        /* Utility for animation/transition */
+        .fade-in {
+            opacity: 1;
+            max-height: 500px;
+            transition: opacity 0.3s ease-in, max-height 0.5s ease-in;
+        }
+        .fade-out {
+            opacity: 0;
+            max-height: 0;
+            overflow: hidden;
+            transition: opacity 0.3s ease-out, max-height 0.5s ease-out;
+        }
+
+    </style>
+</head>
+<body class="bg-[#050508] text-slate-300 min-h-screen selection:bg-cyan-500/20 selection:text-cyan-200 bg-grid-pattern relative overflow-x-hidden">
+
+        <div class="min-h-screen p-4 md:p-8">
+            <div class="fixed top-0 left-1/2 -translate-x-1/2 w-[700px] h-[350px] bg-cyan-900/5 rounded-full blur-[100px] -z-10 pointer-events-none"></div>
+
+            <div class="max-w-7xl mx-auto p-4 md:p-6">
+                
+                <header class="mb-6 flex items-center justify-between border-b border-white/10 pb-4">
+                    <div class="flex items-center gap-3">
+                        <div class="p-2.5 bg-cyan-950/20 border border-cyan-500/20 rounded-lg shadow-[0_0_10px_rgba(34,211,238,0.1)]">
+                            <i data-lucide="plane" class="w-6 h-6 text-cyan-300"></i>
+                        </div>
+                        <div>
+                            <h1 class="text-3xl font-bold text-white tracking-wide glow-text uppercase">Seat Optimiser</h1>
+                            <p class="text-slate-600 text-xs font-semibold tracking-widest uppercase">AM Tycoon // Configuration Assistant // Made by <a href="https://su-consultancy.com" target="_blank" rel="noopener noreferrer" class="hover:underline hover:text-cyan-500 hover:transition hover:duration-300">Umut Yelbaşı</a></p>
+                        </div>
+                        <div class="ml-4 px-2 py-1 text-cyan-300 text-xs font-mono font-semibold uppercase tracking-wider"><a href=" " rel="noopener noreferrer" class="hover:underline hover:text-cyan-500 hover:transition hover:duration-300">Seat Optimiser</a></div>
+                        <div class="ml-4 px-2 py-1 text-cyan-300 text-xs font-mono font-semibold uppercase tracking-wider"><a href="reverse-optimizer.html" rel="noopener noreferrer" class="hover:underline hover:text-cyan-500 hover:transition hover:duration-300">Reverse Optimiser</a></div>
+                    </div>
+                </header>
+        
+        <div class="max-w-7xl mx-auto bg-white p-6 md:p-10 rounded-xl shadow-2xl border border-gray-100">
+            <h1 class="text-3xl font-extrabold text-gray-900 mb-2">
+                Fleet Sizing & Demand Fulfilment
+            </h1>
+            <p class="text-gray-500 mb-8">
+                Calculate the minimum number of aircraft required to satisfy total passenger and cargo demand using your custom seat configuration.
+            </p>
+
+            <!-- Configuration Section -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-8">
+                
+                <!-- Total Demand Inputs (Col 1-5) -->
+                <div class="p-6 bg-indigo-50 rounded-lg shadow-inner col-span-1 lg:col-span-5">
+                    <h2 class="text-lg font-bold text-indigo-800 mb-3">Total Demand Required (All Flights)</h2>
+                    <div class="space-y-4">
+                        <div>
+                            <label for="totalFirstClassDemand" class="block text-xs font-medium text-gray-700">Total First Class Demand (Pax)</label>
+                            <input type="number" id="totalFirstClassDemand" placeholder="0" min="0" value="150"
+                                class="input-field w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                        </div>
+                        <div>
+                            <label for="totalBusinessClassDemand" class="block text-xs font-medium text-gray-700">Total Business Class Demand (Pax)</label>
+                            <input type="number" id="totalBusinessClassDemand" placeholder="0" min="0" value="300"
+                                class="input-field w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                        </div>
+                        <div>
+                            <label for="totalEconomyClassDemand" class="block text-xs font-medium text-gray-700">Total Economy Class Demand (Pax)</label>
+                            <input type="number" id="totalEconomyClassDemand" placeholder="0" min="0" value="800"
+                                class="input-field w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                        </div>
+                        <div>
+                            <label for="totalCargoDemand" class="block text-xs font-medium text-gray-700">Total Cargo Demand (Tons)</label>
+                            <input type="number" id="totalCargoDemand" placeholder="0" min="0" value="15"
+                                class="input-field w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Aircraft Selection & Configuration (Col 6-12) -->
+                <div class="p-6 bg-blue-50 rounded-lg shadow-inner col-span-1 lg:col-span-7">
+                    <h2 class="text-lg font-bold text-blue-800 mb-3">Aircraft Selection & Custom Configuration (Per Plane)</h2>
+                    
+                    <!-- Aircraft Selection -->
+                    <div class="mb-4">
+                        <label class="block text-xs font-medium text-gray-700 mb-1">Selected Aircraft Model</label>
+                        <div class="relative">
+                            <button id="planeSelectButton" class="w-full bg-white border border-gray-300 rounded-lg px-4 py-2 text-left font-medium text-gray-700 hover:bg-gray-50 transition duration-150 flex justify-between items-center" type="button">
+                                <span id="selectedPlaneName">Select Aircraft</span>
+                                <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                            </button>
+                            <div id="planeDropdown" class="hidden absolute z-10 w-full mt-2 bg-white rounded-lg shadow-xl border border-gray-200 max-h-60 overflow-y-auto">
+                                <!-- Options will be populated here -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Custom Seat Configuration (New Inputs) -->
+                    <h3 class="text-sm font-bold text-blue-700 mt-6 mb-3">Custom Seat Configuration (Seats per Class / Per Plane)</h3>
+                    <p class="text-xs text-gray-500 mb-3" id="seatSumStatus">Total Configured Seats: <span id="currentSeatSum" class="font-bold text-green-600">300</span> / Max Capacity: <span id="maxCapacity" class="font-bold">300</span></p>
+                    <div class="grid grid-cols-3 gap-3">
+                        <div>
+                            <label for="configFirst" class="block text-xs font-medium text-gray-700">First Class (Seats)</label>
+                            <input type="number" id="configFirst" placeholder="0" min="0" value="10"
+                                class="config-input input-field w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-center">
+                        </div>
+                        <div>
+                            <label for="configBusiness" class="block text-xs font-medium text-gray-700">Business Class (Seats)</label>
+                            <input type="number" id="configBusiness" placeholder="0" min="0" value="50"
+                                class="config-input input-field w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-center">
+                        </div>
+                        <div>
+                            <label for="configEconomy" class="block text-xs font-medium text-gray-700">Economy Class (Seats)</label>
+                            <input type="number" id="configEconomy" placeholder="0" min="0" value="240"
+                                class="config-input input-field w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-center">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Results Section -->
+            <div class="mt-10 p-6 bg-gray-50 rounded-xl shadow-inner border border-gray-200">
+                <h2 class="text-2xl font-bold text-gray-900 mb-4">Required Fleet Size</h2>
+                
+                <div id="optimizationResult" class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                    <!-- Result 1: Total Aircraft Needed -->
+                    <div class="p-4 bg-white rounded-lg shadow border border-gray-100">
+                        <p class="text-sm font-medium text-gray-500">Minimum Aircraft Required</p>
+                        <p id="aircraftNeeded" class="text-4xl font-extrabold text-blue-600 mt-1">0</p>
+                    </div>
+
+                    <!-- Result 2: Limiting Factor -->
+                    <div class="p-4 bg-white rounded-lg shadow border border-gray-100">
+                        <p class="text-sm font-medium text-gray-500">Limiting Factor</p>
+                        <p id="limitingFactor" class="text-xl font-extrabold text-gray-700 mt-1">N/A</p>
+                    </div>
+
+                    <!-- Result 3: Passenger/Payload Capacity Per Plane -->
+                    <div class="p-4 bg-white rounded-lg shadow border border-gray-100">
+                        <p class="text-sm font-medium text-gray-500">Fleet Utilization</p>
+                        <p id="utilizationSummary" class="text-xl font-extrabold text-gray-700 mt-1">0% / 0%</p>
+                        <p class="text-[10px] text-gray-500">Seats Utilized / Payload Utilized (T)</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Detailed Output -->
+            <div class="mt-8 p-6 bg-gray-50 rounded-xl border border-gray-200">
+                 <h3 class="text-xl font-bold text-gray-900 mb-3">Detailed Calculation Breakdown</h3>
+                 <div id="breakdownOutput" class="text-sm text-gray-700 space-y-2">
+                    <!-- Breakdown details injected here -->
+                 </div>
+            </div>
+
+            <!-- Error Message Box -->
+            <div id="messageBox" class="mt-6 hidden p-3 text-sm text-red-700 bg-red-100 rounded-lg" role="alert"></div>
+
+        </div>
+    </div>
+
+    <script>
+        // Global Constants (Same as previous app for consistency)
+        const WEIGHT_PER_FIRST = 150; // kg (includes baggage)
+        const WEIGHT_PER_BUSINESS = 100; // kg
+        const WEIGHT_PER_ECONOMY = 80; // kg
+        const WEIGHT_PER_CARGO_TON = 1000; // kg
+
+        // Mock Aircraft Data (Payload in KG, Seats total)
+        const AIRCRAFT_DATA = [
+            { id: 'A320', model: 'Airbus A320-200', seats: 180, maxPayloadKG: 21000, price: 101.0 },
+            { id: '737MAX', model: 'Boeing 737 MAX 8', seats: 178, maxPayloadKG: 20000, price: 125.0 },
+            { id: '787-9', model: 'Boeing 787-9 Dreamliner', seats: 290, maxPayloadKG: 50000, price: 292.5 },
+            { id: 'A350-900', model: 'Airbus A350-900', seats: 300, maxPayloadKG: 60000, price: 317.4 },
+            { id: '747F', model: 'Boeing 747-400F (Cargo Only)', seats: 0, maxPayloadKG: 112760, price: 50.0 },
+        ];
+
+        let selectedAircraft = AIRCRAFT_DATA[3]; // Default to A350-900 (300 seats)
+
+        /**
+         * Safely displays a message to the user.
+         */
+        function showMessage(message, type = 'error') {
+            const box = document.getElementById('messageBox');
+            if (!box) return;
+
+            box.className = 'mt-6 p-3 text-sm rounded-lg';
+            box.classList.remove('hidden');
+
+            if (type === 'error') {
+                box.classList.add('text-red-700', 'bg-red-100');
+            } else {
+                box.classList.add('text-green-700', 'bg-green-100');
+            }
+
+            box.innerHTML = message;
+            
+            setTimeout(() => {
+                box.classList.add('hidden');
+            }, 8000);
+        }
+
+        /**
+         * Selects an aircraft, updates max capacity display, and triggers calculation.
+         */
+        function selectAircraft(aircraftId) {
+            const newSelection = AIRCRAFT_DATA.find(a => a.id === aircraftId);
+            if (!newSelection) {
+                showMessage(`Aircraft ID ${aircraftId} not found.`, 'error');
+                return;
+            }
+            selectedAircraft = newSelection;
+            document.getElementById('selectedPlaneName').textContent = selectedAircraft.model;
+            document.getElementById('planeDropdown').classList.add('hidden');
+            
+            // Update max capacity display
+            document.getElementById('maxCapacity').textContent = selectedAircraft.seats.toLocaleString();
+            
+            // If Cargo-only, clear seat inputs
+            if (selectedAircraft.seats === 0) {
+                document.getElementById('configFirst').value = 0;
+                document.getElementById('configBusiness').value = 0;
+                document.getElementById('configEconomy').value = 0;
+                document.getElementById('configFirst').disabled = true;
+                document.getElementById('configBusiness').disabled = true;
+                document.getElementById('configEconomy').disabled = true;
+            } else {
+                document.getElementById('configFirst').disabled = false;
+                document.getElementById('configBusiness').disabled = false;
+                document.getElementById('configEconomy').disabled = false;
+            }
+
+            updateSeatSum(); // Also runs the main calculation
+        }
+
+        /**
+         * Populates the aircraft selection dropdown.
+         */
+        function populateDropdown() {
+            const dropdown = document.getElementById('planeDropdown');
+            dropdown.innerHTML = '';
+
+            AIRCRAFT_DATA.forEach(plane => {
+                const item = document.createElement('div');
+                item.className = 'px-4 py-2 cursor-pointer hover:bg-indigo-100 transition duration-100 text-sm text-gray-800';
+                item.textContent = `${plane.model} (Max Seats: ${plane.seats})`;
+                item.onclick = () => selectAircraft(plane.id);
+                dropdown.appendChild(item);
+            });
+        }
+
+        /**
+         * Core logic to calculate the minimum number of aircraft needed.
+         */
+        function calculateAircraftNeeded() {
+            // --- 1. GET INPUTS (Demand and Single-Plane Configuration) ---
+            const demandF = parseFloat(document.getElementById('totalFirstClassDemand').value) || 0;
+            const demandB = parseFloat(document.getElementById('totalBusinessClassDemand').value) || 0;
+            const demandE = parseFloat(document.getElementById('totalEconomyClassDemand').value) || 0;
+            const demandCargoT = parseFloat(document.getElementById('totalCargoDemand').value) || 0;
+
+            // Single-plane seat configuration
+            const configF = parseFloat(document.getElementById('configFirst').value) || 0;
+            const configB = parseFloat(document.getElementById('configBusiness').value) || 0;
+            const configE = parseFloat(document.getElementById('configEconomy').value) || 0;
+            
+            const totalConfigSeats = configF + configB + configE;
+            const planeMaxSeats = selectedAircraft.seats;
+
+            // --- 2. VALIDATION CHECKS ---
+            
+            if (totalConfigSeats > planeMaxSeats) {
+                showMessage(`The configured seats (${totalConfigSeats}) exceed the selected aircraft's maximum capacity (${planeMaxSeats}). Please reduce the seat count.`, 'error');
+                document.getElementById('aircraftNeeded').textContent = 'ERROR';
+                document.getElementById('limitingFactor').textContent = 'Invalid Config';
+                document.getElementById('breakdownOutput').innerHTML = '<p class="text-red-500">Configuration exceeds aircraft capacity.</p>';
+                return;
+            }
+            
+            if (planeMaxSeats === 0 && (configF > 0 || configB > 0 || configE > 0)) {
+                 showMessage(`Selected aircraft (${selectedAircraft.model}) is Cargo-only and cannot carry any configured passenger seats.`, 'error');
+                 // Don't error out, but set config seats to zero and proceed with cargo check
+                 // For the UI, we already disabled inputs, so this is just a final check.
+            }
+            
+            const totalRequiredPassengers = demandF + demandB + demandE;
+            const totalCargoWeightKG = demandCargoT * WEIGHT_PER_CARGO_TON;
+            
+            // --- 3. CALCULATE WEIGHT OF ONE FULLY CONFIGURED AIRCRAFT ---
+            // Calculate the total weight (Pax + Baggage) for a single, fully loaded configured aircraft
+            const configuredPaxWeightKG = (configF * WEIGHT_PER_FIRST) + 
+                                          (configB * WEIGHT_PER_BUSINESS) + 
+                                          (configE * WEIGHT_PER_ECONOMY);
+            
+            // We assume the non-passenger payload (cargo capacity) of a single flight is the maximum payload
+            // minus the weight taken up by the configured passengers.
+            const availableCargoPayloadKG = selectedAircraft.maxPayloadKG - configuredPaxWeightKG;
+
+            // --- 4. CALCULATE PLANES REQUIRED FOR EACH CONSTRAINT ---
+
+            // A. Planes required by total passenger seats (Capacity Constraint)
+            // Divide total demand passengers by the number of seats available in the configured plane.
+            const planesNeededBySeats = (totalConfigSeats > 0) 
+                ? Math.ceil(totalRequiredPassengers / totalConfigSeats) 
+                : (totalRequiredPassengers > 0 ? Infinity : 0);
+
+            // B. Planes required by total cargo demand (Payload Constraint)
+            // Divide total cargo demand by the cargo capacity available in one configured plane.
+            let planesNeededByPayload = 0;
+            if (totalCargoWeightKG > 0) {
+                if (availableCargoPayloadKG <= 0) {
+                    // Cannot carry any cargo with this configuration
+                    planesNeededByPayload = Infinity;
+                } else {
+                    planesNeededByPayload = Math.ceil(totalCargoWeightKG / availableCargoPayloadKG);
+                }
+            }
+
+
+            // --- 5. DETERMINE FINAL FLEET SIZE AND LIMITING FACTOR ---
+            
+            // Max is taken from the three constraints: Passenger Demand, Cargo Demand, or minimum 1 if any demand exists
+            const finalAircraftNeeded = Math.max(planesNeededBySeats, planesNeededByPayload, 
+                (totalRequiredPassengers > 0 || demandCargoT > 0 ? 1 : 0));
+            
+            let limitingFactor;
+            if (finalAircraftNeeded === 0) {
+                limitingFactor = 'Zero Demand';
+            } else if (planesNeededByPayload > planesNeededBySeats) {
+                limitingFactor = `Cargo/Payload Constraint`;
+            } else if (planesNeededBySeats > planesNeededByPayload) {
+                limitingFactor = `Passenger Seat Constraint`;
+            } else {
+                limitingFactor = `Seats & Payload Equal`;
+            }
+            
+            // --- 6. CALCULATE UTILIZATION (for the limiting factor plane count) ---
+            
+            // Total capacity of the fleet
+            const totalFleetConfigSeats = finalAircraftNeeded * totalConfigSeats;
+            const totalFleetAvailableCargoPayloadKG = finalAircraftNeeded * availableCargoPayloadKG;
+            
+            // Utilization
+            const capacityUtilization = (totalFleetConfigSeats > 0) ? (totalRequiredPassengers / totalFleetConfigSeats) * 100 : 0;
+            const payloadUtilization = (totalFleetAvailableCargoPayloadKG > 0) ? (totalCargoWeightKG / totalFleetAvailableCargoPayloadKG) * 100 : 0;
+            
+
+            // --- 7. UPDATE UI ---
+            
+            // Main Results
+            document.getElementById('aircraftNeeded').textContent = finalAircraftNeeded.toLocaleString();
+            document.getElementById('limitingFactor').textContent = limitingFactor;
+            
+            document.getElementById('utilizationSummary').textContent = 
+                `${capacityUtilization.toFixed(1)}% / ${payloadUtilization.toFixed(1)}%`;
+            
+            // Detailed Breakdown
+            const breakdownHtml = `
+                <p><strong>Configured Seats (Per Plane):</strong> F:${configF}, B:${configB}, E:${configE} (Total: ${totalConfigSeats})</p>
+                <p><strong>Configured Payload Usage (Per Plane):</strong> ${(configuredPaxWeightKG / 1000).toFixed(2)} T for Passengers</p>
+                <p><strong>Available Cargo Payload (Per Plane):</strong> ${(availableCargoPayloadKG / 1000).toFixed(2)} T</p>
+                <hr class="my-2 border-gray-300">
+                <p class="text-indigo-600"><strong>Planes required by Passenger Demand:</strong> ${planesNeededBySeats.toFixed(2)} (Rounded Up: ${Math.ceil(planesNeededBySeats)})</p>
+                <p class="text-indigo-600"><strong>Planes required by Cargo Demand:</strong> ${planesNeededByPayload.toFixed(2)} (Rounded Up: ${Math.ceil(planesNeededByPayload)})</p>
+                <hr class="my-2 border-gray-300">
+                <p class="font-bold">Total Seats in Fleet (${finalAircraftNeeded}x): ${totalFleetConfigSeats.toLocaleString()} configured seats</p>
+                <p class="font-bold">Total Cargo Capacity in Fleet (${finalAircraftNeeded}x): ${(totalFleetAvailableCargoPayloadKG / 1000).toFixed(2)} Tons</p>
+            `;
+            document.getElementById('breakdownOutput').innerHTML = breakdownHtml;
+            
+        }
+
+        /**
+         * Updates the configured seat sum display and triggers calculation.
+         */
+        function updateSeatSum() {
+            const configF = parseFloat(document.getElementById('configFirst').value) || 0;
+            const configB = parseFloat(document.getElementById('configBusiness').value) || 0;
+            const configE = parseFloat(document.getElementById('configEconomy').value) || 0;
+            
+            const currentSum = configF + configB + configE;
+            const maxSeats = selectedAircraft.seats;
+            const sumElement = document.getElementById('currentSeatSum');
+            
+            sumElement.textContent = currentSum.toLocaleString();
+            
+            if (currentSum > maxSeats) {
+                sumElement.classList.remove('text-green-600');
+                sumElement.classList.add('text-red-600');
+            } else {
+                sumElement.classList.remove('text-red-600');
+                sumElement.classList.add('text-green-600');
+            }
+            
+            calculateAircraftNeeded();
+        }
+
+        /**
+         * Initializes event listeners and runs the initial calculation.
+         */
+        function init() {
+            populateDropdown();
+            selectAircraft(selectedAircraft.id); // Initial default selection
+
+            // Input fields for total demand
+            const demandInputs = [
+                'totalFirstClassDemand', 'totalBusinessClassDemand', 'totalEconomyClassDemand', 'totalCargoDemand'
+            ];
+            
+            // Input fields for single-plane configuration
+            const configInputs = ['configFirst', 'configBusiness', 'configEconomy'];
+
+            // Attach listeners to all demand inputs
+            demandInputs.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.addEventListener('input', calculateAircraftNeeded);
+                }
+            });
+            
+            // Attach listeners to configuration inputs (updates sum and calculates fleet size)
+            configInputs.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.addEventListener('input', updateSeatSum);
+                }
+            });
+
+            // Handle dropdown toggle
+            const planeSelectButton = document.getElementById('planeSelectButton');
+            const planeDropdown = document.getElementById('planeDropdown');
+            if (planeSelectButton && planeDropdown) {
+                planeSelectButton.addEventListener('click', () => {
+                    planeDropdown.classList.toggle('hidden');
+                });
+            }
+
+            // Close dropdown when clicking outside
+            document.addEventListener('click', (e) => {
+                if (planeDropdown && !planeSelectButton.contains(e.target) && !planeDropdown.contains(e.target)) {
+                    planeDropdown.classList.add('hidden');
+                }
+            });
+            
+            // Initial setup
+            updateSeatSum(); 
+        }
+
+        // Wait for the entire page to load before running initialization code
+        window.addEventListener('load', init);
+
+    </script>
+</body>
+</html>
