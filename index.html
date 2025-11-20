@@ -676,12 +676,18 @@
                 }
                 
                 // --- Payload Bar Calculation ---
-                // Calculate percentage based on aircraft's max payload
-                const payloadUsedPercent = Math.min(100, (requiredPayload / planePayload) * 100);
-                const payloadBarColor = payloadUsedPercent > 100 ? 'bg-red-500' : 'bg-amber-500';
+                // Payload Bar
+                const payloadUsageRawPercent = (requiredPayload / planePayload) * 100;
+                const payloadBarColor = getBarColor(payloadUsageRawPercent);
+                // The width should be capped at 100% for visual purposes
+                const payloadBarWidthPercent = Math.min(100, payloadUsageRawPercent);
 
-                const capacityUsedPercent = Math.min(100, (totalRequiredCapacityEquivalent / planeCapacity) * 100);
-                const capacityBarColor = capacityUsedPercent > 100 ? 'bg-red-500' : 'bg-amber-500';
+
+                // Capacity Bar
+                const capacityUsageRawPercent = (totalRequiredCapacityEquivalent / planeCapacity) * 100;
+                const capacityBarColor = getBarColor(capacityUsageRawPercent);
+                // The width should be capped at 100% for visual purposes
+                const capacityBarWidthPercent = Math.min(100, capacityUsageRawPercent);
 
                 // --- Generate HTML Row ---
                 const row = `
@@ -691,19 +697,22 @@
                         <td class="p-3">${required.bus.toLocaleString()}</td>
                         <td class="p-3">${required.first.toLocaleString()}</td>
                         <td class="p-3 text-amber-500">${required.cargo.toFixed(2)}</td>
+                        
+                        <!-- PAYLOAD BAR -->
                         <td class="p-3 font-bold">
                             ${requiredPayload.toFixed(2)}
                             <span class="text-[10px] font-normal text-gray-500">/${planePayload.toFixed(2)}</span>
                             <div class="w-full h-1 bg-slate-800 rounded-full mt-1 overflow-hidden">
-                            <div class="h-1 ${payloadBarColor} transition-all duration-500" style="width: ${payloadUsedPercent}%;"></div>
+                            <div class="h-1 ${payloadBarColor} transition-all duration-500" style="width: ${payloadBarWidthPercent}%;"></div>
                             </div>
                         </td>
 
+                        <!-- CAPACITY BAR -->
                         <td class="p-3 font-bold">
                             ${totalRequiredCapacityEquivalent.toFixed(2)}
                             <span class="text-[10px] font-normal text-gray-500">/${planeCapacity.toFixed(2)}</span>
                             <div class="w-full h-1 bg-slate-800 rounded-full mt-1 overflow-hidden">
-                            <div class="h-1 ${capacityBarColor} transition-all duration-500" style="width: ${capacityUsedPercent}%;"></div>
+                            <div class="h-1 ${capacityBarColor} transition-all duration-500" style="width: ${capacityBarWidthPercent}%;"></div>
                             </div>
                         </td>
 
