@@ -293,6 +293,7 @@
                                     <th class="p-3 font-bold text-purple-500">First</th>
                                     <th class="p-3 font-bold text-amber-500">Cargo (t)</th>
                                     <th class="p-3 font-bold text-red-400 min-w-[100px]">Payload (t)</th>
+                                    <th class="p-3 font-bold text-red-400 min-w-[100px]">Capacity</th>
                                     <th class="p-3 font-bold text-green-400">Valid?</th>
                                 </tr>
                             </thead>
@@ -679,6 +680,9 @@
                 const payloadUsedPercent = Math.min(100, (requiredPayload / planePayload) * 100);
                 const payloadBarColor = payloadUsedPercent > 100 ? 'bg-red-500' : 'bg-amber-500';
 
+                const capacityUsedPercent = Math.min(100, (totalRequiredCapacityEquivalent / planeCapacity) * 100);
+                const capacityBarColor = capacityUsedPercent > 100 ? 'bg-red-500' : 'bg-amber-500';
+
                 // --- Generate HTML Row ---
                 const row = `
                     <tr class="${rowClass} ${hoverClass} transition-colors duration-200">
@@ -694,6 +698,15 @@
                             <div class="h-1 ${payloadBarColor} transition-all duration-500" style="width: ${payloadUsedPercent}%;"></div>
                             </div>
                         </td>
+
+                        <td class="p-3 font-bold">
+                            ${totalRequiredCapacityEquivalent.toFixed(2)}
+                            <span class="text-[10px] font-normal text-gray-500">/${planeCapacity.toFixed(2)}</span>
+                            <div class="w-full h-1 bg-slate-800 rounded-full mt-1 overflow-hidden">
+                            <div class="h-1 ${capacityBarColor} transition-all duration-500" style="width: ${capacityUsedPercent}%;"></div>
+                            </div>
+                        </td>
+
                         <td class="p-3 font-bold ${validationColor} flex items-center justify-center gap-1 min-h-[50px] uppercase">
                             <i data-lucide="${validationIcon}" class="w-4 h-4"></i>
                             <span class="text-[10px]">${validationText}</span>
