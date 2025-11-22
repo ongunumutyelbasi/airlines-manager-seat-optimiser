@@ -141,6 +141,7 @@
 
     </style>
 </head>
+
 <body class="bg-[#050508] text-slate-300 min-h-screen selection:bg-cyan-500/20 selection:text-cyan-200 bg-grid-pattern relative overflow-x-hidden">
 
     <!-- Ambient Light Effect --><div class="fixed top-0 left-1/2 -translate-x-1/2 w-[700px] h-[350px] bg-cyan-900/5 rounded-full blur-[100px] -z-10 pointer-events-none"></div>
@@ -153,12 +154,18 @@
                     <i data-lucide="plane" class="w-6 h-6 text-cyan-300"></i>
                 </div>
                 <div>
-                    <h1 class="text-3xl font-bold text-white tracking-wide glow-text uppercase">Seat Planner</h1>
-                    <p class="text-slate-600 text-xs font-semibold tracking-widest uppercase">AM Tycoon // Configuration Assistant // Made by <a href="https://su-consultancy.com" target="_blank" rel="noopener noreferrer" class="hover:underline hover:text-cyan-500 hover:transition hover:duration-300">Umut Yelbaşı</a></p>
+                    <h1 class="text-2xl md:text-3xl font-bold text-white tracking-wide glow-text uppercase">Seat Planner</h1>
+                    <p class="text-slate-600 text-xs font-semibold tracking-widest uppercase hidden md:block">AM Tycoon // Configuration Assistant // Made by <a href="https://su-consultancy.com" target="_blank" rel="noopener noreferrer" class="hover:underline hover:text-cyan-500 hover:transition hover:duration-300">Umut Yelbaşı</a></p>
                 </div>
             </div>
 
-            <nav class="pt-4 mt-2"> <!-- Removed border-t -->
+            <!-- Hamburger Button (Mobile Only) -->
+            <button id="mobile-menu-button" class="lg:hidden p-2 text-cyan-400 hover:text-cyan-300 transition duration-200 hover:bg-cyan-950/20 rounded">
+                <i data-lucide="menu" class="w-6 h-6"></i>
+            </button>
+
+            <!-- Desktop Navigation (Hidden on Mobile) -->
+            <nav class="hidden lg:block pt-4 mt-2">
                 <ul class="flex space-x-8 text-base font-semibold">
                     <li>
                         <!-- Active Link: Reduced bottom padding to pb-0.5 for a tighter border -->
