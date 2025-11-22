@@ -146,6 +146,48 @@
 
     <!-- Ambient Light Effect --><div class="fixed top-0 left-1/2 -translate-x-1/2 w-[700px] h-[350px] bg-cyan-900/5 rounded-full blur-[100px] -z-10 pointer-events-none"></div>
 
+        <!-- Mobile Menu Overlay -->
+    <div id="mobile-menu-overlay" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-40 hidden opacity-0 lg:hidden"></div>
+
+    <!-- Mobile Menu -->
+    <nav id="mobile-menu" class="fixed top-0 right-0 h-full w-80 bg-[#0f1014]/95 backdrop-blur-md border-l border-cyan-500/20 shadow-[-10px_0_30px_-10px_rgba(0,0,0,0.6)] z-50 lg:hidden translate-x-full transition-transform duration-300">
+        <div class="flex flex-col h-full">
+            <!-- Mobile Menu Header -->
+            <div class="flex items-center justify-between p-6 border-b border-white/10">
+                <h2 class="text-xl font-bold text-cyan-400 uppercase tracking-wide">Menu</h2>
+                <button id="mobile-menu-close" class="p-2 text-slate-400 hover:text-cyan-400 transition duration-200">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+            </div>
+            
+            <!-- Mobile Menu Links -->
+            <ul class="flex flex-col p-6 space-y-4 text-base font-semibold">
+                <li>
+                    <a href="#" class="block text-cyan-400 border-l-2 border-cyan-400 pl-4 py-3 transition duration-200">
+                        SEAT PLANNER
+                    </a>
+                </li>
+                <li>
+                    <a href="reverse-optimizer.html" class="block text-slate-400 hover:text-cyan-400 hover:border-l-2 hover:border-cyan-700 pl-4 py-3 transition duration-200">
+                        MULTI-AIRCRAFT SEAT PLANNER
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="block text-slate-400 hover:text-cyan-400 hover:border-l-2 hover:border-cyan-700 pl-4 py-3 transition duration-200">
+                        R&D TRACKER
+                    </a>
+                </li>
+            </ul>
+            
+            <!-- Mobile Menu Footer -->
+            <div class="mt-auto p-6 border-t border-white/10">
+                <p class="text-xs text-slate-600 uppercase tracking-widest">
+                    Made by <a href="https://su-consultancy.com" target="_blank" rel="noopener noreferrer" class="text-cyan-500 hover:underline">Umut Yelbaşı</a>
+                </p>
+            </div>
+        </div>
+    </nav>
+
     <!-- Main Container --><div class="max-w-7xl mx-auto p-4 md:p-6">
         
         <header class="mb-6 flex items-center justify-between border-b border-white/10 pb-4">
@@ -504,6 +546,36 @@
         
         const demandInputs = ['demandEco', 'demandBus', 'demandFirst', 'demandCargo'].map(id => document.getElementById(id));
         const allInputs = [inputCapacity, inputPayload, ...demandInputs, hoursInput, minutesInput, durationToggle];
+
+        // Mobile menu references
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const mobileMenuClose = document.getElementById('mobile-menu-close');
+        const mobileMenuOverlay = document.getElementById('mobile-menu-overlay');
+
+        // Open mobile menu
+        function openMobileMenu() {
+            mobileMenu.classList.remove('translate-x-full');
+            mobileMenu.classList.add('translate-x-0');
+            mobileMenuOverlay.classList.remove('hidden');
+            setTimeout(() => {
+                mobileMenuOverlay.classList.remove('opacity-0');
+                mobileMenuOverlay.classList.add('opacity-100');
+            }, 10);
+            document.body.style.overflow = 'hidden';
+        }
+
+        // Close mobile menu
+        function closeMobileMenu() {
+            mobileMenu.classList.remove('translate-x-0');
+            mobileMenu.classList.add('translate-x-full');
+            mobileMenuOverlay.classList.remove('opacity-100');
+            mobileMenuOverlay.classList.add('opacity-0');
+            setTimeout(() => {
+                mobileMenuOverlay.classList.add('hidden');
+            }, 300);
+            document.body.style.overflow = '';
+        }
 
         /**
          * Converts total minutes to "Hh Mm" format.
@@ -896,6 +968,16 @@
                 }
             });
             
+            // Mobile menu event listeners - add these inside your init() function
+            mobileMenuButton.addEventListener('click', openMobileMenu);
+            mobileMenuClose.addEventListener('click', closeMobileMenu);
+            mobileMenuOverlay.addEventListener('click', closeMobileMenu);
+
+            // Close menu when clicking on a link
+            document.querySelectorAll('#mobile-menu a').forEach(link => {
+                link.addEventListener('click', closeMobileMenu);
+            });
+
             // Initial calculation and UI setup
             calculateSeats();
         }
