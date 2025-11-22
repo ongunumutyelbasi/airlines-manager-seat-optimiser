@@ -779,9 +779,9 @@
             // Ensure value is a number and clamp it between 0 and 100
             const percentage = Math.max(0, Math.min(100, parseFloat(value) || 0));
 
-            if (percentage >= 95) {
+            if (percentage >= 99) {
                 return 'bg-red-600'; // Excellent
-            } else if (percentage >= 80) {
+            } else if (percentage >= 85) {
                 return 'bg-amber-400'; // Good/Warning
             } else if (percentage >= 50) {
                 return 'bg-yellow-500'; // Needs attention
