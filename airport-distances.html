@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Airlines Manager Dynamic Seat Planner</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="icon" type="image/x-icon" href="/images/favicon.png">
+    
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body class="bg-[#050508] text-slate-300 min-h-screen selection:bg-cyan-500/20 selection:text-cyan-200 bg-grid-pattern relative overflow-x-hidden">
+
+    <!-- Ambient Light Effect --><div class="fixed top-0 left-1/2 -translate-x-1/2 w-[700px] h-[350px] bg-cyan-900/5 rounded-full blur-[100px] -z-10 pointer-events-none"></div>
+
+        <!-- Mobile Menu Overlay -->
+    <div id="mobile-menu-overlay" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-40 hidden opacity-0 lg:hidden"></div>
+
+    <!-- Mobile Menu -->
+    <nav id="mobile-menu" class="fixed top-0 right-0 h-full w-80 bg-[#0f1014]/95 backdrop-blur-md border-l border-cyan-500/20 shadow-[-10px_0_30px_-10px_rgba(0,0,0,0.6)] z-50 lg:hidden translate-x-full transition-transform duration-300">
+        <div class="flex flex-col h-full">
+            <!-- Mobile Menu Header -->
+            <div class="flex items-center justify-between p-6 border-b border-white/10">
+                <h2 class="text-xl font-bold text-cyan-400 uppercase tracking-wide">Menu</h2>
+                <button id="mobile-menu-close" class="p-2 text-slate-400 hover:text-cyan-400 transition duration-200">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+            </div>
+            
+            <!-- Mobile Menu Links -->
+            <ul class="flex flex-col p-6 space-y-4 text-base font-semibold">
+                <li>
+                    <a href="#" class="block text-cyan-400 border-l-2 border-cyan-400 pl-4 py-3 transition duration-200">
+                        SEAT PLANNER
+                    </a>
+                </li>
+                <li>
+                    <a href="reverse-optimizer.html" class="block text-slate-400 hover:text-cyan-400 hover:border-l-2 hover:border-cyan-700 pl-4 py-3 transition duration-200">
+                        MULTI-AIRCRAFT SEAT PLANNER
+                    </a>
+                </li>
+            </ul>
+            
+            <!-- Mobile Menu Footer -->
+            <div class="mt-auto p-6 border-t border-white/10">
+                <p class="text-xs text-slate-600 uppercase tracking-widest">
+                    Made by <a href="https://su-consultancy.com" target="_blank" rel="noopener noreferrer" class="text-cyan-500 hover:underline">Umut Yelbaşı</a>
+                </p>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Container --><div class="max-w-7xl mx-auto p-4 md:p-6">
+        
+        <header class="mb-6 flex items-center justify-between border-b border-white/10 pb-4">
+            <div class="flex items-center gap-3">
+                <div class="p-2.5 bg-cyan-950/20 border border-cyan-500/20 rounded-lg shadow-[0_0_10px_rgba(34,211,238,0.1)]">
+                    <i data-lucide="plane" class="w-6 h-6 text-cyan-300"></i>
+                </div>
+                <div>
+                    <h1 class="text-2xl md:text-3xl font-bold text-white tracking-wide glow-text uppercase">Seat Planner</h1>
+                    <p class="text-slate-600 text-xs font-semibold tracking-widest uppercase hidden md:block">AM Tycoon // Configuration Assistant // Made by <a href="https://su-consultancy.com" target="_blank" rel="noopener noreferrer" class="hover:underline hover:text-cyan-500 hover:transition hover:duration-300">Umut Yelbaşı</a></p>
+                </div>
+            </div>
+
+            <!-- Hamburger Button (Mobile Only) -->
+            <button id="mobile-menu-button" class="lg:hidden p-2 text-cyan-400 hover:text-cyan-300 transition duration-200 hover:bg-cyan-950/20 rounded">
+                <i data-lucide="menu" class="w-6 h-6"></i>
+            </button>
+
+            <!-- Desktop Navigation (Hidden on Mobile) -->
+            <nav class="hidden lg:block pt-4 mt-2">
+                <ul class="flex space-x-8 text-base font-semibold">
+                    <li>
+                        <!-- Active Link: Reduced bottom padding to pb-0.5 for a tighter border -->
+                        <a href="#" class="text-cyan-400 border-b-2 border-cyan-400 pb-0.5 transition duration-200">
+                            SEAT PLANNER
+                        </a>
+                    </li>
+                    <li>
+                        <!-- Placeholder Link: Reduced bottom padding for sleeker hover -->
+                        <a href="reverse-optimizer.html" class="text-slate-500 border-cyan-700 hover:text-cyan-400 hover:border-b-2 hover:border-cyan-700 pb-0.5 transition duration-200">
+                            MULTI-AIRCRAFT SEAT PLANNER
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </header>
+
+        <div id="loading" class="text-center p-8">
+            <div class="flex justify-center items-center">
+                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mr-3"></div>
+                <span class="text-gray-600">Loading airport data...</span>
+            </div>
+        </div>
+
+        <form id="distanceForm" class="hidden space-y-6">
+            
+            <div class="space-y-4">
+                <!-- Airport 1 Selection -->
+                <div>
+                    <label for="airport1" class="block text-sm font-medium text-gray-700 mb-1">Departure Airport</label>
+                    <select id="airport1" required
+                            class="custom-input block w-full p-3 border border-gray-300 rounded-lg transition duration-150 ease-in-out focus:ring-primary focus:border-primary">
+                        <option value="" disabled selected>-- Select Airport 1 --</option>
+                    </select>
+                </div>
+
+                <!-- Airport 2 Selection -->
+                <div>
+                    <label for="airport2" class="block text-sm font-medium text-gray-700 mb-1">Arrival Airport</label>
+                    <select id="airport2" required
+                            class="custom-input block w-full p-3 border border-gray-300 rounded-lg transition duration-150 ease-in-out focus:ring-primary focus:border-primary">
+                        <option value="" disabled selected>-- Select Airport 2 --</option>
+                    </select>
+                </div>
+            </div>
+
+            <button type="submit" 
+                    class="w-full py-3 bg-primary text-white font-semibold rounded-full hover:bg-primary-dark transition duration-150 ease-in-out shadow-md hover:shadow-lg">
+                Calculate Distance
+            </button>
+        </form>
+
+        <!-- Result Display -->
+        <div id="resultContainer" class="mt-8 pt-6 border-t border-gray-200 hidden">
+            <h3 class="text-lg font-semibold text-gray-800 mb-3">Result</h3>
+            
+            <div id="result" class="bg-blue-50 border-l-4 border-primary text-gray-900 p-4 rounded-lg shadow-inner">
+                <p id="distanceOutput" class="text-2xl font-bold text-primary">0 km</p>
+                <p id="routeOutput" class="text-sm text-gray-600 mt-1">Select two airports above and click 'Calculate Distance'.</p>
+            </div>
+            
+            <p id="errorMsg" class="text-red-500 mt-4 hidden"></p>
+        </div>
+    </div>
+
+
+    <!-- Firebase SDKs (Included for compliance, though not used for calculation) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        
+        // --- Firebase Initialization (Boilerplate) ---
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : { /* Mock Config */ };
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        let db, auth, userId;
+        try {
+            const app = initializeApp(firebaseConfig);
+            db = getFirestore(app);
+            auth = getAuth(app);
+            
+            (async () => {
+                if (initialAuthToken) {
+                    await signInWithCustomToken(auth, initialAuthToken);
+                } else {
+                    await signInAnonymously(auth);
+                }
+                userId = auth.currentUser?.uid || crypto.randomUUID();
+            })();
+        } catch (e) {
+            console.error("Firebase initialization failed:", e);
+        }
+        
+        // ---------------------------------------------
+        // --- Data Loading and Structuring ---
+        // ---------------------------------------------
+
+        // This JSON object simulates the contents of your airports.json file.
+        // I have included a sample of the data, using the airport key (e.g., "00A") as the top-level identifier.
+        const AIRPORTS_JSON = {
+           "00A": {
+              "type": "heliport", "name": "Total RF Heliport", "iata_code": "", 
+              "coordinates": "40.070985, -74.933689"
+           },
+           "00AA": {
+              "type": "small_airport", "name": "Aero B Ranch Airport", "iata_code": "", 
+              "coordinates": "38.704022, -101.473911"
+           },
+           "00AK": {
+              "type": "small_airport", "name": "Lowell Field", "iata_code": "", 
+              "coordinates": "60.013, -151.699989"
+           },
+           "KJFK": { 
+               "type": "large_airport", "name": "John F Kennedy International Airport", "iata_code": "JFK",
+               "coordinates": "40.63980103, -73.77890015"
+           },
+           "EGLL": { 
+               "type": "large_airport", "name": "London Heathrow Airport", "iata_code": "LHR", 
+               "coordinates": "51.4706, -0.461941"
+           },
+           "ZSPD": { 
+               "type": "large_airport", "name": "Shanghai Pudong International Airport", "iata_code": "PVG", 
+               "coordinates": "31.1434, 121.805"
+           },
+           "SAEZ": { 
+               "type": "large_airport", "name": "Ministro Pistarini International Airport", "iata_code": "EZE", 
+               "coordinates": "-34.8222, -58.5358"
+           },
+           "EGPW": {
+              "type": "small_airport", "name": "Unst Airport", "iata_code": "UNT",
+              "coordinates": "60.7472, -0.85385"
+           },
+           "AYGA": {
+               "type": "medium_airport", "name": "Goroka Airport", "iata_code": "GKA",
+               "coordinates": "-6.08206, 145.392003"
+           }
+           // In your actual app, this object would contain all thousands of entries
+        };
+
+        let AIRPORT_DATA = [];
+
+        /**
+         * Cleans, parses, and formats the raw JSON into a flat array of objects.
+         * The key (e.g., "00A", "KJFK") is saved as 'id' for easy lookup.
+         */
+        function preprocessData(rawData) {
+            const processed = [];
+            for (const id in rawData) {
+                const data = rawData[id];
+                const coords = parseCoordinates(data.coordinates);
+                
+                if (coords && data.name) {
+                    const displayCode = data.iata_code || data.icao_code || id;
+                    processed.push({
+                        id: id,
+                        name: data.name,
+                        display: `${data.name} (${displayCode})`,
+                        lat: coords[0],
+                        lon: coords[1],
+                    });
+                }
+            }
+            return processed;
+        }
+
+        // ---------------------------------------------
+        // --- Core Distance Calculation Logic (Haversine Formula) ---
+        // ---------------------------------------------
+        
+        /**
+         * Calculates the distance between two points on the Earth's surface 
+         * using the Haversine formula.
+         * @param {number} lat1 Latitude of point 1 (degrees)
+         * @param {number} lon1 Longitude of point 1 (degrees)
+         * @param {number} lat2 Latitude of point 2 (degrees)
+         * @param {number} lon2 Longitude of point 2 (degrees)
+         * @returns {number} Distance in kilometers
+         */
+        function calculateDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371; // Radius of Earth in kilometers
+            const dLat = (lat2 - lat1) * (Math.PI / 180);
+            const dLon = (lon2 - lon1) * (Math.PI / 180);
+            
+            const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                      Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) *
+                      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+            
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            
+            return R * c; // Distance in km
+        }
+
+        /**
+         * Parses the string coordinates "lat, lon" into a number array [lat, lon].
+         * @param {string} coordString The coordinate string from the JSON.
+         * @returns {number[]|null} [latitude, longitude] or null if invalid.
+         */
+        function parseCoordinates(coordString) {
+            if (!coordString) return null;
+            const parts = coordString.split(',').map(s => s.trim());
+            const lat = parseFloat(parts[0]);
+            const lon = parseFloat(parts[1]);
+            
+            if (isNaN(lat) || isNaN(lon)) return null;
+            return [lat, lon];
+        }
+
+        // ---------------------------------------------
+        // --- UI Logic and Event Handling ---
+        // ---------------------------------------------
+        
+        const airport1Select = document.getElementById('airport1');
+        const airport2Select = document.getElementById('airport2');
+        const distanceForm = document.getElementById('distanceForm');
+        const resultContainer = document.getElementById('resultContainer');
+        const distanceOutput = document.getElementById('distanceOutput');
+        const routeOutput = document.getElementById('routeOutput');
+        const errorMsg = document.getElementById('errorMsg');
+        const loading = document.getElementById('loading');
+        
+        /**
+         * Populates the two select dropdowns with processed airport data.
+         */
+        function populateDropdowns(data) {
+            const fragment = document.createDocumentFragment();
+
+            data.forEach(airport => {
+                const option = document.createElement('option');
+                option.value = airport.id; // Store the unique ID as the value
+                option.textContent = airport.display;
+                fragment.appendChild(option);
+            });
+
+            // FIX: Clone the fragment BEFORE appending the original to the first element.
+            // This ensures the clone is not empty when appended to the second select.
+            const fragmentClone = fragment.cloneNode(true);
+
+            // Append the original fragment to the first select (this consumes the fragment)
+            airport1Select.appendChild(fragment); 
+
+            // Append the cloned fragment to the second select
+            airport2Select.appendChild(fragmentClone);
+        }
+
+        /**
+         * Finds the airport object by its unique ID.
+         */
+        function getAirportById(id) {
+            return AIRPORT_DATA.find(a => a.id === id);
+        }
+
+        /**
+         * Handles form submission and calculates the distance.
+         */
+        function handleCalculate(e) {
+            e.preventDefault();
+            errorMsg.classList.add('hidden');
+            resultContainer.classList.remove('hidden');
+
+            const id1 = airport1Select.value;
+            const id2 = airport2Select.value;
+
+            if (id1 === id2) {
+                distanceOutput.textContent = '0 km';
+                routeOutput.textContent = 'The two selected airports are the same.';
+                return;
+            }
+
+            const airport1 = getAirportById(id1);
+            const airport2 = getAirportById(id2);
+            
+            if (!airport1 || !airport2) {
+                errorMsg.textContent = 'Error: Could not retrieve airport coordinates.';
+                errorMsg.classList.remove('hidden');
+                return;
+            }
+
+            const distance = calculateDistance(
+                airport1.lat, airport1.lon,
+                airport2.lat, airport2.lon
+            );
+
+            // Display results
+            distanceOutput.textContent = `${distance.toLocaleString(undefined, { maximumFractionDigits: 0 })} km`;
+            routeOutput.textContent = `Distance from ${airport1.display} to ${airport2.display} (Great-Circle)`;
+        }
+
+
+        // --- Application Setup ---
+        window.onload = () => {
+            // 1. Process data from the raw JSON
+            AIRPORT_DATA = preprocessData(AIRPORTS_JSON);
+            
+            // 2. Populate UI
+            if (AIRPORT_DATA.length > 0) {
+                populateDropdowns(AIRPORT_DATA);
+                distanceForm.classList.remove('hidden');
+                loading.classList.add('hidden');
+            } else {
+                loading.innerHTML = '<p class="text-red-500">Error: No valid airport data loaded.</p>';
+                return;
+            }
+            
+            // 3. Attach event listener
+            distanceForm.addEventListener('submit', handleCalculate);
+        };
+        
+    </script>
+</body>
+</html>
