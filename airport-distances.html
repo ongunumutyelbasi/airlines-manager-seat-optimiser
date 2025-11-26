@@ -103,39 +103,83 @@
 
         <form id="distanceForm" class="hidden space-y-6">
             
-            <div class="space-y-4">
-                <!-- Airport 1 Selection -->
-                <div>
-                    <label for="airport1" class="block text-sm font-medium text-gray-700 mb-1">Departure Airport</label>
-                    <select id="airport1" required
-                            class="custom-input block w-full p-3 border border-gray-300 rounded-lg transition duration-150 ease-in-out focus:ring-primary focus:border-primary">
-                        <option value="" disabled selected>-- Select Airport 1 --</option>
-                    </select>
+            <div class="space-y-6">
+                <!-- Airport 1 Selection (Departure) -->
+                <div class="relative">
+                    <label class="block text-sm font-medium text-gray-400 mb-1">DEPARTURE TERMINAL</label>
+                    <input 
+                        type="text" 
+                        id="airport1Input" 
+                        placeholder="Search Airport Name or Code..." 
+                        class="search-input w-full p-3 rounded-lg focus:border-neon focus:ring-neon transition duration-150 ease-in-out cursor-pointer"
+                        data-airport-id=""
+                        readonly
+                    >
+                    
+                    <!-- Custom Dropdown Container 1 -->
+                    <div 
+                        id="airport1Dropdown" 
+                        class="absolute z-50 left-0 right-0 mt-1 bg-card border border-cyan-500/20 rounded shadow-[0_10px_30px_-10px_rgba(0,0,0,0.8)] hidden overflow-hidden"
+                    >
+                        <div class="p-2 border-b border-white/5 bg-card sticky top-0">
+                            <input 
+                                type="text" 
+                                id="airport1Search" 
+                                placeholder="FILTER TERMINALS..." 
+                                class="w-full bg-black/50 border border-white/10 rounded px-3 py-1.5 text-sm text-cyan-200 placeholder-slate-600 focus:border-cyan-400 focus:outline-none tracking-wide"
+                            >
+                        </div>
+                        <div id="airport1List" class="max-h-60 overflow-y-auto divide-y divide-white/5">
+                            <!-- Options injected by JS -->
+                        </div>
+                    </div>
                 </div>
 
-                <!-- Airport 2 Selection -->
-                <div>
-                    <label for="airport2" class="block text-sm font-medium text-gray-700 mb-1">Arrival Airport</label>
-                    <select id="airport2" required
-                            class="custom-input block w-full p-3 border border-gray-300 rounded-lg transition duration-150 ease-in-out focus:ring-primary focus:border-primary">
-                        <option value="" disabled selected>-- Select Airport 2 --</option>
-                    </select>
+                <!-- Airport 2 Selection (Arrival) -->
+                <div class="relative">
+                    <label class="block text-sm font-medium text-gray-400 mb-1">ARRIVAL TERMINAL</label>
+                    <input 
+                        type="text" 
+                        id="airport2Input" 
+                        placeholder="Search Airport Name or Code..." 
+                        class="search-input w-full p-3 rounded-lg focus:border-neon focus:ring-neon transition duration-150 ease-in-out cursor-pointer"
+                        data-airport-id=""
+                        readonly
+                    >
+
+                    <!-- Custom Dropdown Container 2 -->
+                    <div 
+                        id="airport2Dropdown" 
+                        class="absolute z-50 left-0 right-0 mt-1 bg-card border border-cyan-500/20 rounded shadow-[0_10px_30px_-10px_rgba(0,0,0,0.8)] hidden overflow-hidden"
+                    >
+                        <div class="p-2 border-b border-white/5 bg-card sticky top-0">
+                            <input 
+                                type="text" 
+                                id="airport2Search" 
+                                placeholder="FILTER TERMINALS..." 
+                                class="w-full bg-black/50 border border-white/10 rounded px-3 py-1.5 text-sm text-cyan-200 placeholder-slate-600 focus:border-cyan-400 focus:outline-none tracking-wide"
+                            >
+                        </div>
+                        <div id="airport2List" class="max-h-60 overflow-y-auto divide-y divide-white/5">
+                            <!-- Options injected by JS -->
+                        </div>
+                    </div>
                 </div>
             </div>
 
             <button type="submit" 
                     class="w-full py-3 bg-primary text-white font-semibold rounded-full hover:bg-primary-dark transition duration-150 ease-in-out shadow-md hover:shadow-lg">
-                Calculate Distance
+                CALCULATE LINK DISTANCE
             </button>
         </form>
 
         <!-- Result Display -->
-        <div id="resultContainer" class="mt-8 pt-6 border-t border-gray-200 hidden">
-            <h3 class="text-lg font-semibold text-gray-800 mb-3">Result</h3>
+        <div id="resultContainer" class="mt-8 pt-6 border-t border-gray-700 hidden">
+            <h3 class="text-lg font-semibold text-gray-400 mb-3">CALCULATED LINK</h3>
             
-            <div id="result" class="bg-blue-50 border-l-4 border-primary text-gray-900 p-4 rounded-lg shadow-inner">
-                <p id="distanceOutput" class="text-2xl font-bold text-primary">0 km</p>
-                <p id="routeOutput" class="text-sm text-gray-600 mt-1">Select two airports above and click 'Calculate Distance'.</p>
+            <div id="result" class="bg-black/20 border-l-4 border-neon text-white p-4 rounded-lg shadow-inner">
+                <p id="distanceOutput" class="text-3xl font-bold text-neon tracking-wider">0 km</p>
+                <p id="routeOutput" class="text-sm text-gray-400 mt-2">Select two terminals above to initiate calculation.</p>
             </div>
             
             <p id="errorMsg" class="text-red-500 mt-4 hidden"></p>
@@ -177,18 +221,17 @@
         // ---------------------------------------------
 
         // This JSON object simulates the contents of your airports.json file.
-        // I have included a sample of the data, using the airport key (e.g., "00A") as the top-level identifier.
         const AIRPORTS_JSON = {
            "00A": {
-              "type": "heliport", "name": "Total RF Heliport", "iata_code": "", 
+              "type": "heliport", "name": "Total RF Heliport", "iata_code": "00A", 
               "coordinates": "40.070985, -74.933689"
            },
            "00AA": {
-              "type": "small_airport", "name": "Aero B Ranch Airport", "iata_code": "", 
+              "type": "small_airport", "name": "Aero B Ranch Airport", "iata_code": "AEX", 
               "coordinates": "38.704022, -101.473911"
            },
            "00AK": {
-              "type": "small_airport", "name": "Lowell Field", "iata_code": "", 
+              "type": "small_airport", "name": "Lowell Field", "iata_code": "LFL", 
               "coordinates": "60.013, -151.699989"
            },
            "KJFK": { 
@@ -214,15 +257,26 @@
            "AYGA": {
                "type": "medium_airport", "name": "Goroka Airport", "iata_code": "GKA",
                "coordinates": "-6.08206, 145.392003"
-           }
-           // In your actual app, this object would contain all thousands of entries
+           },
+           "EDDT": { 
+               "type": "large_airport", "name": "Berlin Tegel Airport", "iata_code": "TXL", 
+               "coordinates": "52.5597, 13.2877"
+           },
+           "WSSS": { 
+               "type": "large_airport", "name": "Singapore Changi Airport", "iata_code": "SIN", 
+               "coordinates": "1.35019, 103.994003"
+           },
+           "FAOR": { 
+               "type": "large_airport", "name": "O.R. Tambo International Airport", "iata_code": "JNB", 
+               "coordinates": "-26.1392, 28.246"
+           },
         };
 
-        let AIRPORT_DATA = [];
+        let AIRPORT_DATA = []; // Array of processed airport objects
+        let AIRPORT_MAP = {}; // Map for quick lookup {id: airport_object}
 
         /**
-         * Cleans, parses, and formats the raw JSON into a flat array of objects.
-         * The key (e.g., "00A", "KJFK") is saved as 'id' for easy lookup.
+         * Cleans, parses, and formats the raw JSON into usable data structures.
          */
         function preprocessData(rawData) {
             const processed = [];
@@ -231,31 +285,42 @@
                 const coords = parseCoordinates(data.coordinates);
                 
                 if (coords && data.name) {
-                    const displayCode = data.iata_code || data.icao_code || id;
-                    processed.push({
+                    const displayCode = (data.iata_code || data.icao_code || id).toUpperCase();
+                    const airport = {
                         id: id,
                         name: data.name,
+                        code: displayCode,
                         display: `${data.name} (${displayCode})`,
                         lat: coords[0],
                         lon: coords[1],
-                    });
+                        searchText: `${data.name.toLowerCase()} ${displayCode.toLowerCase()}`
+                    };
+                    processed.push(airport);
+                    AIRPORT_MAP[id] = airport;
                 }
             }
             return processed;
         }
 
         // ---------------------------------------------
-        // --- Core Distance Calculation Logic (Haversine Formula) ---
+        // --- Core Distance Calculation Logic ---
         // ---------------------------------------------
         
         /**
-         * Calculates the distance between two points on the Earth's surface 
-         * using the Haversine formula.
-         * @param {number} lat1 Latitude of point 1 (degrees)
-         * @param {number} lon1 Longitude of point 1 (degrees)
-         * @param {number} lat2 Latitude of point 2 (degrees)
-         * @param {number} lon2 Longitude of point 2 (degrees)
-         * @returns {number} Distance in kilometers
+         * Parses the string coordinates "lat, lon" into a number array [lat, lon].
+         */
+        function parseCoordinates(coordString) {
+            if (!coordString) return null;
+            const parts = coordString.split(',').map(s => s.trim());
+            const lat = parseFloat(parts[0]);
+            const lon = parseFloat(parts[1]);
+            
+            if (isNaN(lat) || isNaN(lon)) return null;
+            return [lat, lon];
+        }
+
+        /**
+         * Calculates the distance between two points on the Earth's surface.
          */
         function calculateDistance(lat1, lon1, lat2, lon2) {
             const R = 6371; // Radius of Earth in kilometers
@@ -271,63 +336,111 @@
             return R * c; // Distance in km
         }
 
-        /**
-         * Parses the string coordinates "lat, lon" into a number array [lat, lon].
-         * @param {string} coordString The coordinate string from the JSON.
-         * @returns {number[]|null} [latitude, longitude] or null if invalid.
-         */
-        function parseCoordinates(coordString) {
-            if (!coordString) return null;
-            const parts = coordString.split(',').map(s => s.trim());
-            const lat = parseFloat(parts[0]);
-            const lon = parseFloat(parts[1]);
-            
-            if (isNaN(lat) || isNaN(lon)) return null;
-            return [lat, lon];
-        }
-
         // ---------------------------------------------
-        // --- UI Logic and Event Handling ---
+        // --- UI Logic and Event Handling for Searchable Dropdowns ---
         // ---------------------------------------------
         
-        const airport1Select = document.getElementById('airport1');
-        const airport2Select = document.getElementById('airport2');
         const distanceForm = document.getElementById('distanceForm');
         const resultContainer = document.getElementById('resultContainer');
         const distanceOutput = document.getElementById('distanceOutput');
         const routeOutput = document.getElementById('routeOutput');
         const errorMsg = document.getElementById('errorMsg');
         const loading = document.getElementById('loading');
+
+        // References for the first dropdown
+        const input1 = document.getElementById('airport1Input');
+        const search1 = document.getElementById('airport1Search');
+        const list1 = document.getElementById('airport1List');
+        const dropdown1 = document.getElementById('airport1Dropdown');
+
+        // References for the second dropdown
+        const input2 = document.getElementById('airport2Input');
+        const search2 = document.getElementById('airport2Search');
+        const list2 = document.getElementById('airport2List');
+        const dropdown2 = document.getElementById('airport2Dropdown');
         
+        // --- Dropdown Management Functions ---
+
         /**
-         * Populates the two select dropdowns with processed airport data.
+         * Renders the list of airports into the dropdown container.
+         * @param {Array} airports - Filtered array of airport objects.
+         * @param {HTMLElement} listElement - The <div> to render the list items into.
          */
-        function populateDropdowns(data) {
+        function renderAirportList(airports, listElement) {
+            listElement.innerHTML = '';
             const fragment = document.createDocumentFragment();
 
-            data.forEach(airport => {
-                const option = document.createElement('option');
-                option.value = airport.id; // Store the unique ID as the value
-                option.textContent = airport.display;
-                fragment.appendChild(option);
-            });
-
-            // FIX: Clone the fragment BEFORE appending the original to the first element.
-            // This ensures the clone is not empty when appended to the second select.
-            const fragmentClone = fragment.cloneNode(true);
-
-            // Append the original fragment to the first select (this consumes the fragment)
-            airport1Select.appendChild(fragment); 
-
-            // Append the cloned fragment to the second select
-            airport2Select.appendChild(fragmentClone);
+            if (airports.length === 0) {
+                const noResult = document.createElement('div');
+                noResult.className = 'list-item text-gray-500';
+                noResult.textContent = 'No results found.';
+                fragment.appendChild(noResult);
+            } else {
+                airports.forEach(airport => {
+                    const item = document.createElement('div');
+                    item.className = 'list-item text-sm text-white';
+                    item.textContent = airport.display;
+                    item.setAttribute('data-id', airport.id);
+                    fragment.appendChild(item);
+                });
+            }
+            listElement.appendChild(fragment);
         }
 
         /**
-         * Finds the airport object by its unique ID.
+         * Sets up the interactive logic for a single searchable dropdown.
+         * @param {HTMLElement} inputField - The main input display field.
+         * @param {HTMLElement} searchInput - The input field used for filtering.
+         * @param {HTMLElement} listContainer - The <div> containing the list items.
+         * @param {HTMLElement} dropdownContainer - The floating <div> wrapper.
          */
-        function getAirportById(id) {
-            return AIRPORT_DATA.find(a => a.id === id);
+        function setupSearchableDropdown(inputField, searchInput, listContainer, dropdownContainer) {
+            
+            // 1. Show the dropdown when the main input is clicked
+            inputField.addEventListener('click', () => {
+                // Hide the other dropdown first
+                if (dropdownContainer === dropdown1) {
+                    dropdown2.classList.add('hidden');
+                } else {
+                    dropdown1.classList.add('hidden');
+                }
+
+                // Show the current dropdown
+                dropdownContainer.classList.remove('hidden');
+                searchInput.value = '';
+                searchInput.focus();
+                renderAirportList(AIRPORT_DATA, listContainer);
+            });
+
+            // 2. Hide the dropdown when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!dropdownContainer.contains(e.target) && e.target !== inputField) {
+                    dropdownContainer.classList.add('hidden');
+                }
+            });
+
+            // 3. Filtering logic
+            searchInput.addEventListener('input', () => {
+                const query = searchInput.value.toLowerCase();
+                const filtered = AIRPORT_DATA.filter(airport => 
+                    airport.searchText.includes(query)
+                );
+                renderAirportList(filtered, listContainer);
+            });
+
+            // 4. Selection logic
+            listContainer.addEventListener('click', (e) => {
+                const item = e.target.closest('.list-item');
+                if (item && item.hasAttribute('data-id')) {
+                    const id = item.getAttribute('data-id');
+                    const airport = AIRPORT_MAP[id];
+
+                    inputField.value = airport.display;
+                    inputField.setAttribute('data-airport-id', id);
+
+                    dropdownContainer.classList.add('hidden');
+                }
+            });
         }
 
         /**
@@ -338,20 +451,28 @@
             errorMsg.classList.add('hidden');
             resultContainer.classList.remove('hidden');
 
-            const id1 = airport1Select.value;
-            const id2 = airport2Select.value;
+            const id1 = input1.getAttribute('data-airport-id');
+            const id2 = input2.getAttribute('data-airport-id');
 
-            if (id1 === id2) {
+            if (!id1 || !id2) {
+                errorMsg.textContent = 'Error: Please select both a Departure and Arrival Terminal.';
+                errorMsg.classList.remove('hidden');
                 distanceOutput.textContent = '0 km';
-                routeOutput.textContent = 'The two selected airports are the same.';
+                routeOutput.textContent = 'Calculation failed.';
                 return;
             }
 
-            const airport1 = getAirportById(id1);
-            const airport2 = getAirportById(id2);
+            if (id1 === id2) {
+                distanceOutput.textContent = '0 km';
+                routeOutput.textContent = 'The two selected terminals are the same.';
+                return;
+            }
+
+            const airport1 = AIRPORT_MAP[id1];
+            const airport2 = AIRPORT_MAP[id2];
             
             if (!airport1 || !airport2) {
-                errorMsg.textContent = 'Error: Could not retrieve airport coordinates.';
+                errorMsg.textContent = 'Error: Could not retrieve terminal coordinates.';
                 errorMsg.classList.remove('hidden');
                 return;
             }
@@ -363,7 +484,7 @@
 
             // Display results
             distanceOutput.textContent = `${distance.toLocaleString(undefined, { maximumFractionDigits: 0 })} km`;
-            routeOutput.textContent = `Distance from ${airport1.display} to ${airport2.display} (Great-Circle)`;
+            routeOutput.textContent = `Link established: ${airport1.display} to ${airport2.display}`;
         }
 
 
@@ -372,17 +493,21 @@
             // 1. Process data from the raw JSON
             AIRPORT_DATA = preprocessData(AIRPORTS_JSON);
             
-            // 2. Populate UI
+            // 2. Set up the two searchable dropdowns
             if (AIRPORT_DATA.length > 0) {
-                populateDropdowns(AIRPORT_DATA);
+                setupSearchableDropdown(input1, search1, list1, dropdown1);
+                setupSearchableDropdown(input2, search2, list2, dropdown2);
+                
+                // 3. Show UI and hide loading
                 distanceForm.classList.remove('hidden');
+                resultContainer.classList.remove('hidden');
                 loading.classList.add('hidden');
             } else {
-                loading.innerHTML = '<p class="text-red-500">Error: No valid airport data loaded.</p>';
+                loading.innerHTML = '<p class="text-red-500">Error: No valid terminal data loaded.</p>';
                 return;
             }
             
-            // 3. Attach event listener
+            // 4. Attach form event listener
             distanceForm.addEventListener('submit', handleCalculate);
         };
         
