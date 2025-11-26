@@ -245,7 +245,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-        
+
         // --- Firebase Initialization (Boilerplate) ---
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : { /* Mock Config */ };
@@ -273,57 +273,23 @@
         // --- Data Loading and Structuring ---
         // ---------------------------------------------
 
-        // This JSON object simulates the contents of your airports.json file.
-        const AIRPORTS_JSON = {
-           "00A": {
-              "type": "heliport", "name": "Total RF Heliport", "iata_code": "00A", 
-              "coordinates": "40.070985, -74.933689"
-           },
-           "00AA": {
-              "type": "small_airport", "name": "Aero B Ranch Airport", "iata_code": "AEX", 
-              "coordinates": "38.704022, -101.473911"
-           },
-           "00AK": {
-              "type": "small_airport", "name": "Lowell Field", "iata_code": "LFL", 
-              "coordinates": "60.013, -151.699989"
-           },
-           "KJFK": { 
-               "type": "large_airport", "name": "John F Kennedy International Airport", "iata_code": "JFK",
-               "coordinates": "40.63980103, -73.77890015"
-           },
-           "EGLL": { 
-               "type": "large_airport", "name": "London Heathrow Airport", "iata_code": "LHR", 
-               "coordinates": "51.4706, -0.461941"
-           },
-           "ZSPD": { 
-               "type": "large_airport", "name": "Shanghai Pudong International Airport", "iata_code": "PVG", 
-               "coordinates": "31.1434, 121.805"
-           },
-           "SAEZ": { 
-               "type": "large_airport", "name": "Ministro Pistarini International Airport", "iata_code": "EZE", 
-               "coordinates": "-34.8222, -58.5358"
-           },
-           "EGPW": {
-              "type": "small_airport", "name": "Unst Airport", "iata_code": "UNT",
-              "coordinates": "60.7472, -0.85385"
-           },
-           "AYGA": {
-               "type": "medium_airport", "name": "Goroka Airport", "iata_code": "GKA",
-               "coordinates": "-6.08206, 145.392003"
-           },
-           "EDDT": { 
-               "type": "large_airport", "name": "Berlin Tegel Airport", "iata_code": "TXL", 
-               "coordinates": "52.5597, 13.2877"
-           },
-           "WSSS": { 
-               "type": "large_airport", "name": "Singapore Changi Airport", "iata_code": "SIN", 
-               "coordinates": "1.35019, 103.994003"
-           },
-           "FAOR": { 
-               "type": "large_airport", "name": "O.R. Tambo International Airport", "iata_code": "JNB", 
-               "coordinates": "-26.1392, 28.246"
-           },
-        };
+        async function fetchAirportData() {
+            try {
+                const response = await fetch('airports.json');
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                
+                const airportData = await response.json();
+                console.log("Data loaded successfully.");
+                return airportData; // The JavaScript object containing your airport data
+
+            } catch (error) {
+                console.error("Failed to load airports.json:", error);
+                return null;
+            }
+        }
 
         let AIRPORT_DATA = []; // Array of processed airport objects
         let AIRPORT_MAP = {}; // Map for quick lookup {id: airport_object}
@@ -542,11 +508,20 @@
 
 
         // --- Application Setup ---
-        window.onload = () => {
+        window.onload = async () => {
+            // CRITICAL: Call the async fetch function and wait for the raw data object.
+            const rawData = await fetchAirportData();
+            
+            // Check if the fetch failed (returned null/error)
+            if (!rawData) {
+                loading.innerHTML = '<p class="text-red-500">Error: Terminal data failed to load via fetch.</p>';
+                return; // Stop execution if data isn't available
+            }
+            
             lucide.createIcons();
             
             // 1. Process data from the raw JSON
-            AIRPORT_DATA = preprocessData(AIRPORTS_JSON);
+            AIRPORT_DATA = preprocessData(rawData);
             
             // 2. Set up the two searchable dropdowns
             if (AIRPORT_DATA.length > 0) {
