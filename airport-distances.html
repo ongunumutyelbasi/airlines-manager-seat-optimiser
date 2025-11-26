@@ -8,6 +8,46 @@
     
     <script src="https://cdn.tailwindcss.com"></script>
     
+    <style>
+        /* Custom utility classes */
+        .bg-grid-pattern {
+            /* A dark background pattern for a tech/data look */
+            background-color: #050508;
+            background-image: linear-gradient(rgba(34, 211, 238, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(34, 211, 238, 0.05) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        .glow-text {
+            text-shadow: 0 0 5px rgba(34, 211, 238, 0.5), 0 0 10px rgba(34, 211, 238, 0.2);
+        }
+        
+        /* Custom styling for the list items in the dropdown */
+        .list-item {
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            transition: background-color 150ms ease-in-out;
+            /* Ensure list items have text color for visibility */
+            color: #e2e8f0; /* slate-200 */
+        }
+        .list-item:hover {
+            background-color: #0d121a; /* Darker shade for hover */
+            color: #22d3ee;
+        }
+
+        /* Input focus styling adjustments */
+        .search-input:focus {
+            border-color: #22d3ee !important;
+            box-shadow: 0 0 0 3px rgba(34, 211, 238, 0.3) !important;
+            outline: none;
+        }
+        
+        /* Style the search input within the dropdown for consistency */
+        #airport1Search, #airport2Search {
+            color: #22d3ee; /* Neon color for input text */
+            background-color: #050508; /* Darker background for the search bar */
+        }
+    </style>
+
     <script src="https://unpkg.com/lucide@latest"></script>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
