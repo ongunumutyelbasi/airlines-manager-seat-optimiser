@@ -503,6 +503,8 @@
 
         // --- Application Setup ---
         window.onload = () => {
+            lucide.createIcons();
+            
             // 1. Process data from the raw JSON
             AIRPORT_DATA = preprocessData(AIRPORTS_JSON);
             
